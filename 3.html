@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3. Принципы интерактивности и UX‑дизайна</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>3. Принципы интерактивности и UX‑дизайна</h1>
+      <nav class="toc">
+        <a href="#3-1">3.1 Интерактивность: понятие</a>
+        <a href="#3-2">3.2 Основные принципы UX‑дизайна</a>
+        <a href="#3-3">3.3 Интерактивные элементы интерфейса</a>
+        <a href="#3-4">3.4 Реакция интерфейса на действия</a>
+        <a href="#3-5">3.5 Виды анимаций и их назначение</a>
+        <a href="#3-6">3.6 UX‑паттерны для сценариев</a>
+        <a href="#3-7">3.7 Адаптивная интерактивность</a>
+        <a href="#3-8">3.8 Пример интерактивной карточки</a>
+        <a href="#3-9">3.9 Паттерны пользовательского интерфейса</a>
+        <a href="#3-10">3.10 Адаптивность и доступность (A11y)</a>
+      </nav>
+    </header>
+
+    <section id="3-1">
+      <h2>3.1. Понятие интерактивности</h2>
+      <p><strong>Интерактивность</strong> — способность веб‑интерфейса реагировать на действия пользователя быстро, наглядно и предсказуемо. Интерактивные элементы делают взаимодействие с системой естественным, поддерживая обратную связь (<em>feedback</em>) и повышая удовлетворённость пользователя (<em>UX — User Experience</em>).</p>
+      <p><strong>Ключевая цель UX:</strong> пользователь должен понимать, что происходит — интерфейс должен отвечать на клики, ввод данных, загрузку, ошибки и успехи.</p>
+    </section>
+
+    <section id="3-2">
+      <h2>3.2. Основные принципы UX‑дизайна</h2>
+      <table>
+        <thead><tr><th>Принцип</th><th>Суть</th><th>Пример</th></tr></thead>
+        <tbody>
+          <tr><td>Обратная связь</td><td>Каждый пользовательский жест вызывает видимую реакцию системы</td><td>Подсветка кнопки, уведомление после сохранения</td></tr>
+          <tr><td>Предсказуемость</td><td>Поведение элементов логичное и последовательное</td><td>Иконка корзины всегда означает удаление</td></tr>
+          <tr><td>Доступность</td><td>Элементы понятны всем категориям пользователей</td><td>Контрастный текст, <code>alt</code>-подписи, крупные зоны клика</td></tr>
+          <tr><td>Визуальная иерархия</td><td>Важные элементы выделены визуально</td><td>Акцентный цвет на CTA‑кнопках</td></tr>
+          <tr><td>Минимизация когнитивной нагрузки</td><td>Пользователь не должен догадываться, что делать</td><td>Простые формы, подсказки, автофокус</td></tr>
+          <tr><td>Мгновенность</td><td>Результат действия отображается без задержки</td><td>Анимация загрузки, toast‑уведомления</td></tr>
+          <tr><td>Контекстность</td><td>Система показывает нужные элементы в нужный момент</td><td>Кнопка «Сохранить» появляется только при изменениях</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="3-3">
+      <h2>3.3. Интерактивные элементы интерфейса</h2>
+      <p>Современные веб‑приложения используют множество динамических элементов, повышающих вовлечённость пользователя.</p>
+      <table>
+        <thead><tr><th>Элемент</th><th>Описание</th><th>Пример</th></tr></thead>
+        <tbody>
+          <tr><td>Hover‑эффекты</td><td>Визуальная реакция при наведении</td><td>Подсветка карточки спектакля</td></tr>
+          <tr><td>Кнопки с анимацией</td><td>Плавные переходы состояний</td><td>«Купить билет» меняет цвет при клике</td></tr>
+          <tr><td>Toast‑уведомления</td><td>Короткие сообщения о результате действия</td><td>«Билет добавлен в корзину»</td></tr>
+          <tr><td>Модальные окна</td><td>Подтверждение/ввод данных</td><td>Подтверждение бронирования</td></tr>
+          <tr><td>Индикаторы загрузки</td><td>Показывают выполнение запроса</td><td>«Загрузка афиши…»</td></tr>
+          <tr><td>Слайдеры/карусели</td><td>Перелистывание изображений</td><td>Промо‑баннер спектаклей</td></tr>
+          <tr><td>Динамические графики</td><td>Визуализация статистики</td><td>Продажи билетов по жанрам</td></tr>
+          <tr><td>Анимации</td><td>Подчёркивают переходы и акценты</td><td>Плавное появление карточек при скролле</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="3-4">
+      <h2>3.4. Реакция интерфейса на действия пользователя</h2>
+
+      <h3>А) Hover‑эффекты (CSS)</h3>
+      <pre><code class="language-css">button {
+  background-color: #0044cc;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+button:hover {
+  background-color: #0066ff;
+}</code></pre>
+      <div class="note"><p><strong>Комментарий:</strong> <code>transition</code> делает реакцию плавной, создавая ощущение отзывчивости.</p></div>
+
+      <h3>Б) Всплывающие уведомления (JS)</h3>
+      <pre><code class="language-html">&lt;button id="buyBtn"&gt;Купить билет&lt;/button&gt;
+&lt;div id="toast" class="toast"&gt;Билет добавлен в корзину!&lt;/div&gt;</code></pre>
+      <pre><code class="language-css">.toast {
+  visibility: hidden;
+  background: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.toast.show { visibility: visible; opacity: 1; }</code></pre>
+      <pre><code class="language-js">const btn = document.getElementById("buyBtn");
+const toast = document.getElementById("toast");
+btn.addEventListener("click", () =&gt; {
+  toast.classList.add("show");
+  setTimeout(() =&gt; toast.classList.remove("show"), 2000);
+});</code></pre>
+      <div class="note"><p><strong>Результат:</strong> при клике пользователь видит быстрое уведомление — мгновенная обратная связь.</p></div>
+
+      <h3>В) Анимации появления (CSS keyframes)</h3>
+      <pre><code class="language-css">@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card { animation: fadeIn 0.6s ease; }</code></pre>
+      <p>Применяется к карточкам спектаклей, отзывам, формам входа.</p>
+
+      <h3>Г) Динамические графики (Chart.js)</h3>
+      <pre><code class="language-html">&lt;canvas id="stats"&gt;&lt;/canvas&gt;</code></pre>
+      <pre><code class="language-js">import Chart from "https://cdn.jsdelivr.net/npm/chart.js";
+const ctx = document.getElementById("stats");
+new Chart(ctx, {
+  type: "bar",
+  data: {
+    labels: ["Драма", "Балет", "Комедия"],
+    datasets: [{
+      label: "Продажи билетов",
+      data: [120, 90, 150],
+      backgroundColor: ["#007bff", "#28a745", "#ffc107"]
+    }]
+  }
+});</code></pre>
+      <div class="note"><p><strong>Результат:</strong> интерактивный график обновляется при изменении данных — пример UX‑аналитики внутри приложения.</p></div>
+    </section>
+
+    <section id="3-5">
+      <h2>3.5. Виды анимаций и их назначение</h2>
+      <table>
+        <thead><tr><th>Тип анимации</th><th>Применение</th><th>Эффект UX</th></tr></thead>
+        <tbody>
+          <tr><td>Микроанимации</td><td>Подсветка, смена иконки, цвет</td><td>Уточняют результат действия</td></tr>
+          <tr><td>Переходы между состояниями</td><td>Появление/исчезновение окон</td><td>Поддерживают чувство контекста</td></tr>
+          <tr><td>Прогресс‑бар / лоадер</td><td>Отображение процесса выполнения</td><td>Снижает ощущение ожидания</td></tr>
+          <tr><td>Параллакс и плавный скролл</td><td>Визуальное погружение</td><td>Эмоциональное вовлечение</td></tr>
+          <tr><td>Анимация ошибок</td><td>Валидация форм (shake)</td><td>Помогает заметить проблему</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="3-6">
+      <h2>3.6. UX‑паттерны для интерактивных сценариев</h2>
+      <table>
+        <thead><tr><th>Сценарий</th><th>UX‑паттерн</th><th>Пример</th></tr></thead>
+        <tbody>
+          <tr><td>Отправка формы</td><td>Loader + Toast</td><td>«Регистрация успешно выполнена»</td></tr>
+          <tr><td>Ошибка валидации</td><td>Shake + красная рамка</td><td>Поле подсвечивается красным</td></tr>
+          <tr><td>Загрузка данных</td><td>Skeleton / Spinner</td><td>Скелет‑заглушка контента</td></tr>
+          <tr><td>Сохранение данных</td><td>Иконка ✓ + fade‑эффект</td><td>Появляется «Сохранено»</td></tr>
+          <tr><td>Уведомление об успехе</td><td>Toast/Snackbar</td><td>«Билет добавлен в корзину»</td></tr>
+          <tr><td>Навигация</td><td>Highlight активного пункта</td><td>Подсветка текущей страницы</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="3-7">
+      <h2>3.7. Адаптивная интерактивность</h2>
+      <ul>
+        <li>Кнопки и ссылки — не менее 44×44 px (WCAG).</li>
+        <li><em>Hover</em>-эффекты заменяются на состояния <em>tap</em> на сенсорных экранах.</li>
+        <li>Анимации — плавные и ненавязчивые.</li>
+        <li>Уведомления не перекрывают контент на маленьких экранах.</li>
+      </ul>
+    </section>
+
+    <section id="3-8">
+      <h2>3.8. Пример: интерактивная карточка спектакля</h2>
+      <pre><code class="language-html">&lt;article class="card"&gt;
+  &lt;img src="poster.jpg" alt="Ромео и Джульетта"&gt;
+  &lt;h3&gt;Ромео и Джульетта&lt;/h3&gt;
+  &lt;p&gt;Премьера — 10 ноября, 19:00&lt;/p&gt;
+  &lt;button&gt;Купить билет&lt;/button&gt;
+&lt;/article&gt;</code></pre>
+      <pre><code class="language-css">.card {
+  background: #fff;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+button:hover {
+  background-color: #28a745;
+  color: #fff;
+  transition: 0.3s;
+}</code></pre>
+      <div class="note"><p><strong>Результат:</strong> карточка слегка всплывает при наведении, создавая ощущение живого интерфейса.</p></div>
+    </section>
+
+    <section id="3-9">
+      <h2>3.9. Паттерны пользовательского интерфейса (UI/UX‑Design)</h2>
+
+      <h3 id="3-9-1">3.9.1. Понятие и назначение паттернов</h3>
+      <p><strong>Паттерн интерфейса (UI Pattern)</strong> — повторяемое решение типичной задачи взаимодействия пользователя с системой, проверенное временем и воспринимаемое пользователями как привычное.</p>
+      <ul>
+        <li>Сокращают путь пользователя к цели.</li>
+        <li>Обеспечивают предсказуемость и узнаваемость интерфейсов.</li>
+        <li>Повышают скорость проектирования и единообразие в команде.</li>
+        <li>Снижают количество ошибок и когнитивную нагрузку.</li>
+      </ul>
+
+      <h3 id="3-9-2">3.9.2. Классификация UI‑паттернов</h3>
+      <table>
+        <thead><tr><th>Тип паттерна</th><th>Назначение</th><th>Примеры</th></tr></thead>
+        <tbody>
+          <tr><td>Ввод данных</td><td>Взаимодействие с формами, валидация</td><td>Поля ввода, чекбоксы, переключатели, формы</td></tr>
+          <tr><td>Организация контента</td><td>Структурирование информации</td><td>Карточки, таблицы, списки, модальные окна</td></tr>
+          <tr><td>Навигация</td><td>Перемещение по разделам</td><td>Меню, вкладки, хлебные крошки, боковая панель</td></tr>
+          <tr><td>Система обратной связи</td><td>Ответы на действия</td><td>Toast, loaders, skeleton</td></tr>
+          <tr><td>Управление состояниями</td><td>Показ успеха/ошибок/пустых состояний</td><td>No Data, Error, Success</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="3-9-3">3.9.3. Базовые паттерны взаимодействия</h3>
+
+      <h4>1) Формы ввода (Forms)</h4>
+      <p><strong>Назначение:</strong> получение данных от пользователя — регистрация, поиск, фильтрация, обратная связь.</p>
+      <ul class="kv">
+        <li>Минимум обязательных полей; группировка по смыслу.</li>
+        <li>Подсказки (<code>placeholder</code>, <code>label</code>); валидация в реальном времени.</li>
+      </ul>
+      <pre><code class="language-html">&lt;form id="feedback"&gt;
+  &lt;label&gt;Ваше имя:&lt;/label&gt;
+  &lt;input type="text" name="name" required&gt;
+  &lt;label&gt;Email:&lt;/label&gt;
+  &lt;input type="email" name="email" required&gt;
+  &lt;label&gt;Сообщение:&lt;/label&gt;
+  &lt;textarea name="message"&gt;&lt;/textarea&gt;
+  &lt;button type="submit"&gt;Отправить&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+      <pre><code class="language-js">document.getElementById("feedback").addEventListener("submit", e =&gt; {
+  e.preventDefault();
+  alert("Спасибо за обратную связь!");
+});</code></pre>
+      <div class="note"><p><strong>UX‑совет:</strong> добавляйте индикаторы ошибок и автоподсказки (например, при неправильном email — красная рамка и подсказка).</p></div>
+
+      <h4>2) Фильтры и поиск (Filters)</h4>
+      <pre><code class="language-html">&lt;select id="genre"&gt;
+  &lt;option value=""&gt;Все жанры&lt;/option&gt;
+  &lt;option value="драма"&gt;Драма&lt;/option&gt;
+  &lt;option value="комедия"&gt;Комедия&lt;/option&gt;
+&lt;/select&gt;
+&lt;input type="text" id="search" placeholder="Поиск по названию"&gt;
+&lt;ul id="shows"&gt;&lt;/ul&gt;</code></pre>
+      <pre><code class="language-js">const shows = [
+  { title: "Гамлет", genre: "драма" },
+  { title: "Щелкунчик", genre: "балет" },
+  { title: "Ревизор", genre: "комедия" }
+];
+function render(list) {
+  document.getElementById("shows").innerHTML =
+    list.map(s =&gt; `&lt;li&gt;${s.title}&lt;/li&gt;`).join("");
+}
+document.getElementById("genre").addEventListener("change", e =&gt; {
+  const val = e.target.value;
+  render(shows.filter(s =&gt; !val || s.genre === val));
+});
+render(shows);</code></pre>
+      <div class="note"><p><strong>UX‑совет:</strong> фильтры должны применяться моментально (без кнопки «Применить»).</p></div>
+
+      <h4>3) Карточки контента (Cards)</h4>
+      <pre><code class="language-html">&lt;article class="card"&gt;
+  &lt;img src="poster.jpg" alt="Афиша спектакля"&gt;
+  &lt;h3&gt;Ромео и Джульетта&lt;/h3&gt;
+  &lt;p&gt;Премьера — 10 ноября&lt;/p&gt;
+  &lt;button&gt;Купить билет&lt;/button&gt;
+&lt;/article&gt;</code></pre>
+      <pre><code class="language-css">.card {
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+.card:hover { transform: translateY(-5px); }</code></pre>
+      <div class="note"><p><strong>UX‑совет:</strong> используйте визуальную иерархию: изображение → заголовок → описание → кнопка.</p></div>
+
+      <h4>4) Навигационные панели (Navigation bars)</h4>
+      <pre><code class="language-html">&lt;nav class="navbar"&gt;
+  &lt;a href="#home"&gt;Главная&lt;/a&gt;
+  &lt;a href="#repertoire"&gt;Репертуар&lt;/a&gt;
+  &lt;a href="#tickets"&gt;Билеты&lt;/a&gt;
+  &lt;a href="#contacts"&gt;Контакты&lt;/a&gt;
+&lt;/nav&gt;</code></pre>
+      <pre><code class="language-css">.navbar { display: flex; justify-content: space-around; background: #0044cc; }
+.navbar a { color: #fff; padding: 10px 15px; text-decoration: none; }
+.navbar a:hover { background: #0066ff; }</code></pre>
+      <div class="note"><p><strong>UX‑совет:</strong> добавляйте активное состояние для текущей страницы.</p></div>
+
+      <h4>5) Пагинация (Pagination)</h4>
+      <pre><code class="language-html">&lt;div class="pagination"&gt;
+  &lt;button disabled&gt;&amp;lt;&lt;/button&gt;
+  &lt;button class="active"&gt;1&lt;/button&gt;
+  &lt;button&gt;2&lt;/button&gt;
+  &lt;button&gt;3&lt;/button&gt;
+  &lt;button&gt;&amp;gt;&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+      <pre><code class="language-css">.pagination button {
+  margin: 2px; border: none; padding: 8px 12px; cursor: pointer;
+}
+.pagination .active { background-color: #007bff; color: #fff; }</code></pre>
+      <div class="note"><p><strong>UX‑совет:</strong> добавляйте индикацию количества элементов и «Показать ещё» для мобильных.</p></div>
+
+      <h4>6) Toast‑уведомления</h4>
+      <pre><code class="language-html">&lt;div id="toast"&gt;Билет добавлен в корзину&lt;/div&gt;</code></pre>
+      <pre><code class="language-css">#toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: #333; color: #fff; padding: 12px 20px;
+  border-radius: 8px; opacity: 0; transition: opacity 0.5s;
+}
+#toast.show { opacity: 1; }</code></pre>
+      <pre><code class="language-js">function showToast() {
+  const t = document.getElementById("toast");
+  t.classList.add("show");
+  setTimeout(() =&gt; t.classList.remove("show"), 2000);
+}</code></pre>
+      <div class="note"><p><strong>UX‑совет:</strong> сообщения короткие (1–2 секунды) и не блокируют интерфейс.</p></div>
+
+      <h4>7) Skeleton‑загрузка</h4>
+      <pre><code class="language-html">&lt;div class="skeleton"&gt;&lt;/div&gt;
+&lt;div class="skeleton"&gt;&lt;/div&gt;
+&lt;div class="skeleton"&gt;&lt;/div&gt;</code></pre>
+      <pre><code class="language-css">.skeleton {
+  height: 100px;
+  background: linear-gradient(90deg, #eee, #ddd, #eee);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+@keyframes loading {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}</code></pre>
+      <div class="note"><p><strong>UX‑эффект:</strong> skeleton‑загрузка уменьшает ощущение ожидания — пользователь видит, что контент подготавливается.</p></div>
+
+      <h3 id="3-9-4">3.9.4. Принципы выбора паттерна</h3>
+      <ol>
+        <li>Соответствие задаче: форма для данных, карточка для объектов, таблица для аналитики.</li>
+        <li>Контекст: фильтр на главной — компактный; в каталоге — раскрытый.</li>
+        <li>Согласованность: карточки, кнопки и уведомления выглядят и ведут себя одинаково.</li>
+        <li>Адаптивность: элементы перестраиваются под экран (Grid/Flex).</li>
+        <li>Ненавязчивость: анимации и уведомления не отвлекают от основной задачи.</li>
+      </ol>
+    </section>
+
+    <section id="3-10">
+      <h2>3.10. Адаптивность и доступность (Accessibility)</h2>
+
+      <h3 id="3-10-1">3.10.1. Понятие и цель</h3>
+      <p><strong>Адаптивность</strong> — способность интерфейса корректно отображаться на устройствах с разным разрешением и ориентацией экрана.</p>
+      <p><strong>Доступность (A11y)</strong> — свойство интерфейса быть понятным и удобным для всех пользователей, включая людей с ограниченными возможностями.</p>
+      <p><strong>Цель:</strong> обеспечить равный доступ к функционалу независимо от устройства, среды и физических возможностей человека.</p>
+
+      <h3 id="3-10-2">3.10.2. Основные принципы WCAG 2.1 (POUR)</h3>
+      <table>
+        <thead><tr><th>Принцип</th><th>Расшифровка</th><th>Суть</th></tr></thead>
+        <tbody>
+          <tr><td>P — Perceivable</td><td>Воспринимаемость</td><td>Альтернативный текст, субтитры, контраст</td></tr>
+          <tr><td>O — Operable</td><td>Управляемость</td><td>Навигация Tab, видимый фокус</td></tr>
+          <tr><td>U — Understandable</td><td>Понятность</td><td>Последовательность заголовков, понятные ошибки</td></tr>
+          <tr><td>R — Robust</td><td>Надёжность</td><td>Семантический HTML, стандартные теги</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="3-10-3">3.10.3. Структура документа и семантика</h3>
+      <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="ru"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Театр «АртДом» — Афиша&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;header&gt;
+    &lt;h1&gt;Театр «АртДом»&lt;/h1&gt;
+    &lt;nav aria-label="Главное меню"&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href="#repertoire"&gt;Репертуар&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#tickets"&gt;Билеты&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#contacts"&gt;Контакты&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/nav&gt;
+  &lt;/header&gt;
+
+  &lt;main id="repertoire"&gt;
+    &lt;h2&gt;Афиша спектаклей&lt;/h2&gt;
+    &lt;article&gt;
+      &lt;h3&gt;Ромео и Джульетта&lt;/h3&gt;
+      &lt;p&gt;Премьера — 10 ноября&lt;/p&gt;
+      &lt;button aria-label="Купить билет на Ромео и Джульетту"&gt;Купить билет&lt;/button&gt;
+    &lt;/article&gt;
+  &lt;/main&gt;
+
+  &lt;footer&gt;
+    &lt;p&gt;© 2025 Театр «АртДом»&lt;/p&gt;
+  &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      <ul class="kv">
+        <li>Используйте правильную иерархию заголовков (<code>h1–h6</code>) и <code>lang="ru"</code> для языка.</li>
+        <li>Размечайте области страницы семантическими тегами (<code>header</code>, <code>nav</code>, <code>main</code>, <code>article</code>, <code>footer</code>).</li>
+      </ul>
+
+      <h3 id="3-10-4">3.10.4. Альтернативный текст и описания</h3>
+      <pre><code class="language-html">&lt;img src="poster.jpg" alt="Афиша спектакля «Гамлет»"&gt;</code></pre>
+      <ul>
+        <li><code>alt</code> описывает смысл изображения (например, «актёр в роли Гамлета»).</li>
+        <li>Для декоративных картинок — <code>alt=""</code>.</li>
+        <li>Не дублируйте подписи, если текст рядом.</li>
+      </ul>
+
+      <h3 id="3-10-5">3.10.5. Атрибуты ARIA</h3>
+      <table>
+        <thead><tr><th>Атрибут</th><th>Назначение</th><th>Пример</th></tr></thead>
+        <tbody>
+          <tr><td><code>aria-label</code></td><td>Название элемента</td><td><code>&lt;button aria-label="Открыть меню"&gt;☰&lt;/button&gt;</code></td></tr>
+          <tr><td><code>aria-expanded</code></td><td>Состояние раскрытия</td><td><code>&lt;button aria-expanded="false"&gt;Меню&lt;/button&gt;</code></td></tr>
+          <tr><td><code>aria-hidden</code></td><td>Скрытие для скринридеров</td><td><code>&lt;div aria-hidden="true"&gt;&lt;/div&gt;</code></td></tr>
+          <tr><td><code>role</code></td><td>Тип элемента</td><td><code>&lt;div role="alert"&gt;Ошибка!&lt;/div&gt;</code></td></tr>
+          <tr><td><code>aria-live</code></td><td>Обновления в реальном времени</td><td><code>&lt;div aria-live="polite"&gt;&lt;/div&gt;</code></td></tr>
+        </tbody>
+      </table>
+      <div class="note"><p><strong>Важно:</strong> применяйте ARIA там, где нет нативного HTML‑аналога.</p></div>
+
+      <h3 id="3-10-6">3.10.6. Контрастность и цветовая палитра</h3>
+      <pre><code class="language-css">body { background: #ffffff; color: #1a1a1a; }
+button { background: #0044cc; color: #fff; }
+button:hover { background: #0066ff; }</code></pre>
+      <ul>
+        <li>Контраст текста и фона не ниже 4.5:1; для крупных шрифтов — 3:1.</li>
+        <li>Избегайте сочетаний красный/зеленый для индикации; используйте цвет + форму.</li>
+      </ul>
+
+      <h3 id="3-10-7">3.10.7. Навигация с клавиатуры</h3>
+      <pre><code class="language-css">button:focus, a:focus {
+  outline: 2px solid #ff8800;
+  outline-offset: 2px;
+}</code></pre>
+      <ul>
+        <li>Все интерактивные элементы доступны через <kbd>Tab</kbd>.</li>
+        <li>Не удаляйте <code>outline</code> без замены.</li>
+        <li>Логичный порядок табуляции.</li>
+      </ul>
+
+      <h3 id="3-10-8">3.10.8. Адаптивность и мобильная доступность</h3>
+      <pre><code class="language-html">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code></pre>
+      <table>
+        <thead><tr><th>Приём</th><th>Цель</th><th>Пример</th></tr></thead>
+        <tbody>
+          <tr><td>Flex/Grid</td><td>Гибкое расположение</td><td><code>display: flex; flex-wrap: wrap;</code></td></tr>
+          <tr><td>Медиа‑запросы</td><td>Настройка под разрешение</td><td><code>@media (max-width: 768px) { ... }</code></td></tr>
+          <tr><td>Респонсивные единицы</td><td>Масштабирование</td><td><code>font-size: 1.2rem; width: 90%;</code></td></tr>
+          <tr><td>Крупные зоны клика</td><td>Удобство на сенсорных экранах</td><td>Кнопки ≥ 44×44 px</td></tr>
+          <tr><td>Тестирование</td><td>Проверка читаемости/контраста</td><td>Chrome DevTools → Responsive Mode</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="3-10-9">3.10.9. Проверка доступности (A11y Audit)</h3>
+      <ul>
+        <li>Lighthouse (Chrome DevTools) — вкладка Accessibility.</li>
+        <li>axe DevTools — плагин для анализа ошибок WCAG.</li>
+        <li>WAVE — онлайн‑проверка структуры и контраста.</li>
+        <li>NVDA / VoiceOver — тестирование со скринридером.</li>
+      </ul>
+      <p><strong>Цель проверки:</strong> на странице не должно быть недоступных элементов, неописанных изображений, отсутствующих заголовков и неочевидных интерактивных зон.</p>
+    </section>
+
+  </div>
+</body>
+</html>

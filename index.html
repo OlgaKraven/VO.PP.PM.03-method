@@ -1,0 +1,1299 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Архитектурные основы веб-приложений — полный конспект</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({ startOnLoad: true, securityLevel: "loose", theme: "default" });
+  </script>
+  <style>
+    details summary {cursor:pointer; font-weight:600; margin: 8px 0}
+    details > pre {margin-top:8px; white-space: pre-wrap}
+    table {border-collapse: collapse; width:100%}
+    th, td {border:1px solid var(--line, #ddd); padding:8px; text-align:left}
+    th {background:#fafafa}
+    code {white-space: pre-wrap}
+    .wrap {max-width: 1100px; margin: 0 auto; padding: 24px}
+    nav a {margin-right: 8px; display:inline-block}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Архитектурные основы веб-приложений</h1>
+       <nav>
+      <a href="#1">1. Архитектурные основы веб-приложений</a>
+      <a href="#1-1">1.1 Архитектура ИС</a>
+      <a href="#1-2">1.2 Модели</a>
+      <a href="#1-3">1.3 SPA</a>
+      <a href="#1-4">1.4 Принципы</a>
+      <a href="#1-5">1.5 Театр (3 архитектуры)</a>
+      <a href="#1-6">1.6 НФТ/Метрики</a>   
+      <a href="#c4">1.7. C4-модель</a>
+      <a href="#data">1.8. Моделирование данных</a>
+    </nav>
+  </header>
+
+  <section id="1">
+    <h2>1. Архитектурные основы веб-приложений</h2>
+
+    <section id="1-1">
+      <h3>1.1. Что такое архитектура информационной системы</h3>
+      <p>Архитектура ИС — это целостная схема того, как компоненты системы устроены и взаимодействуют: уровни (клиент, сервер, данные), протоколы (HTTP, AMQP), границы ответственности, интеграции, нефункциональные требования (масштабируемость, отказоустойчивость, безопасность, наблюдаемость).</p>
+
+      <h4>Ключевые цели архитектуры</h4>
+      <ul>
+        <li>Масштабируемость: выдерживать рост пользователей и данных (горизонтально/вертикально).</li>
+        <li>Модульность: изоляция компонентов, слабая связность, сильная связность внутри модуля.</li>
+        <li>Сопровождаемость: читаемость, тестируемость, автоматизация деплоя.</li>
+        <li>Надёжность: устойчивость к сбоям, деградация вместо падения.</li>
+        <li>Безопасность: аутентификация, авторизация, защита данных, секрет-менеджмент.</li>
+        <li>Производительность: latency/throughput, кэширование, CDN, профайлинг.</li>
+        <li>Наблюдаемость: логи, метрики, трейсы, дашборды, алёртинг.</li>
+      </ul>
+
+      <h4>Типовая слоистая структура веб-приложения</h4>
+      <ul>
+        <li>Клиент (Frontend): браузер/мобильное приложение (HTML/CSS/JS; SPA/SSR).</li>
+        <li>API-шлюз / Edge: маршрутизация, CORS, rate-limit, аутентификация.</li>
+        <li>Бизнес-логика (Backend): контроллеры → сервисы → репозитории.</li>
+        <li>Данные: SQL/NoSQL, поиск (Elasticsearch), кэши (Redis), очереди (RabbitMQ/Kafka), файлохранилище (S3).</li>
+        <li>Интеграции: платёжные шлюзы, почта/SMS, внешние реестры, вебхуки.</li>
+        <li>DevOps-контур: CI/CD, IaC, мониторинг, алёртинг.</li>
+      </ul>
+
+      <h4>Мини-диаграмма «контекст»</h4>
+      <pre class="mermaid">
+flowchart LR
+  User[Пользователь] --> Browser[Браузер/Мобильный клиент]
+  Browser -->|HTTP/HTTPS| API[API-шлюз/Reverse Proxy]
+  API --> BE[Сервис приложения]
+  BE --> DB[(База данных)]
+  BE --> Cache[(Кэш)]
+  BE --> MQ[[Очередь сообщений]]
+  BE --> Ext{{Внешние сервисы}}
+      </pre>
+    </section>
+
+    <section id="1-2">
+      <h3>1.2. Модели построения веб-приложений</h3>
+
+      <h4>Монолитная архитектура</h4>
+      <p><strong>Определение:</strong> всё приложение развёртывается как единый артефакт (один процесс/репозиторий), содержит UI, API, бизнес-логику и доступ к данным.</p>
+      <h5>Плюсы</h5>
+      <ul>
+        <li>Простая разработка и деплой на старте.</li>
+        <li>Сквозная транзакционность проще.</li>
+        <li>Единое место правды (меньше сетевых вызовов).</li>
+      </ul>
+      <h5>Минусы</h5>
+      <ul>
+        <li>Рост сложности со временем: «комбайн».</li>
+        <li>Масштабирование только целиком.</li>
+        <li>Риск сильной связности и узких мест.</li>
+      </ul>
+      <h5>Когда уместно</h5>
+      <p>MVP/учебный проект, маленькая команда, чёткая предметная область.</p>
+
+      <details>
+        <summary>Мини-пример (Node/Express, «театр»)</summary>
+        <pre><code>// app.js (монолит)
+const express = require('express');
+const app = express();
+// роуты: /auth, /repertoire, /tickets
+// единый ORM и одна БД
+</code></pre>
+      </details>
+
+      <h4>Клиент–серверная модель (многоуровневый монолит)</h4>
+      <p><strong>Определение:</strong> чёткая граница между клиентом (UI) и сервером (API), иногда добавляют уровень БД/кэша/очередей как отдельные узлы. По сути, это монолит на стороне бэка, но с явным API.</p>
+      <h5>Плюсы</h5>
+      <ul>
+        <li>Чистая ответственность: UI отдельно, API отдельно.</li>
+        <li>Можно масштабировать фронт и бэк независимо.</li>
+        <li>Легче перейти к микросервисам: API уже есть.</li>
+      </ul>
+      <h5>Минусы</h5>
+      <ul>
+        <li>Бэк всё ещё «единый кусок».</li>
+        <li>Точки отказа: API/БД.</li>
+      </ul>
+      <h5>Когда уместно</h5>
+      <p>Учебные системы, корпоративные порталы, интернет-магазины до «взрывного» роста.</p>
+
+      <details>
+        <summary>Мини-пример (разделение)</summary>
+        <pre><code>frontend/ (React/Vue)
+backend/  (Express/Spring)
+db/       (PostgreSQL)
+</code></pre>
+      </details>
+
+      <h4>Микросервисная архитектура</h4>
+      <p><strong>Определение:</strong> система из множества независимых сервисов, каждый решает маленькую задачу, развёртывается/масштабируется отдельно, общается по API/сообщениям.</p>
+      <h5>Плюсы</h5>
+      <ul>
+        <li>Независимые релизы и масштабирование.</li>
+        <li>Изоляция отказов, гибкость технологий (polyglot).</li>
+        <li>Модульность и чёткие границы доменов (DDD).</li>
+      </ul>
+      <h5>Минусы</h5>
+      <ul>
+        <li>Сложность оркестрации и DevOps.</li>
+        <li>Сетевые задержки, консистентность «в итоге».</li>
+        <li>Требуются сильные практики наблюдаемости.</li>
+      </ul>
+      <h5>Когда уместно</h5>
+      <p>Большие команды/продукты, быстрорастущая нагрузка, «много доменов».</p>
+      <p><strong>Мини-пример (театр):</strong> Отдельные сервисы: auth, repertoire, tickets, payments, notifications. Коммуникация — REST + события в Kafka при покупке билета.</p>
+
+      <h5>Схема взаимодействия</h5>
+      <pre class="mermaid">
+flowchart LR
+  Client --> APIGW[API Gateway]
+  APIGW --> AUTH[Auth]
+  APIGW --> REP[Repertoire]
+  APIGW --> TCK[Tickets]
+  APIGW --> PAY[Payments]
+  TCK -->|Event: TicketSold| BUS[[Event Bus]]
+  PAY -->|Event: PaymentCaptured| BUS
+  BUS --> NOTIF[Notifications]
+  TCK --> DB1[(Tickets DB)]
+  REP --> DB2[(Repertoire DB)]
+  PAY --> DB3[(Payments DB)]
+      </pre>
+
+      <h4>Сравнительная таблица</h4>
+      <table>
+        <thead>
+          <tr><th>Критерий</th><th>Монолит</th><th>Клиент–сервер</th><th>Микросервисы</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Скорость старта</td><td>⭐⭐⭐⭐</td><td>⭐⭐⭐</td><td>⭐</td></tr>
+          <tr><td>Масштабируемость</td><td>⭐⭐</td><td>⭐⭐⭐</td><td>⭐⭐⭐⭐</td></tr>
+          <tr><td>Сложность DevOps</td><td>низкая</td><td>средняя</td><td>высокая</td></tr>
+          <tr><td>Изоляция отказов</td><td>низкая</td><td>средняя</td><td>высокая</td></tr>
+          <tr><td>Командная автономия</td><td>низкая</td><td>средняя</td><td>высокая</td></tr>
+          <tr><td>Транзакции</td><td>просто</td><td>просто</td><td>сложно (сага/оркестрация)</td></tr>
+          <tr><td>Стоимость владения на масштабе</td><td>растёт сильно</td><td>умеренно</td><td>оптимальна при большом масштабе</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="1-3">
+      <h3>1.3. Одностраничные приложения (SPA) и соседние подходы</h3>
+      <p>SPA (Single Page Application) — приложение, где браузер загружает «каркас» один раз, дальше контент меняется динамически (через API) без полной перезагрузки страниц. Примеры: панели управления, маркетплейсы, мессенджеры.</p>
+      <p><strong>Плюсы:</strong> отзывчивость, богатый UX, переиспользование компонентов.<br><strong>Минусы:</strong> SEO/первый рендер, размер бандла, сложность состояния.</p>
+
+      <h4>Важные соседние режимы рендера</h4>
+      <ul>
+        <li>CSR (Client-Side Rendering): рендер в браузере, минимальная нагрузка на сервер, хуже TTFB/SEO.</li>
+        <li>SSR (Server-Side Rendering): сервер отрисовывает HTML, лучше TTFB/SEO, затем «гидратация».</li>
+        <li>SSG (Static Site Generation): генерация HTML на сборке (документация, маркетинг).</li>
+        <li>ISR (Incremental Static Regeneration): гибрид — статические страницы с фоновым обновлением (Next.js).</li>
+        <li>MPA (Multi-Page App): классический подход — каждая страница рендерится и загружается заново.</li>
+      </ul>
+
+      <h4>Выбор стратегии</h4>
+      <ul>
+        <li>Панель администратора/личный кабинет → SPA/CSR + частичный SSR для критичных страниц.</li>
+        <li>Публичный каталог билетов/репертуара с SEO → SSR/ISR, кэш + CDN.</li>
+        <li>Блог/новостные → SSG/ISR.</li>
+      </ul>
+
+      <details>
+        <summary>Мини-пример маршрутизации SPA (React-Router)</summary>
+        <pre><code>import { BrowserRouter, Routes, Route } from "react-router-dom";
+export default function App() {
+  return (
+    &lt;BrowserRouter&gt;
+      &lt;Routes&gt;
+        &lt;Route path="/" element={&lt;Repertoire /&gt;} /&gt;
+        &lt;Route path="/event/:id" element={&lt;EventPage /&gt;} /&gt;
+        &lt;Route path="/cart" element={&lt;Cart /&gt;} /&gt;
+        &lt;Route path="/profile" element={&lt;Profile /&gt;} /&gt;
+      &lt;/Routes&gt;
+    &lt;/BrowserRouter&gt;
+  );
+}
+</code></pre>
+      </details>
+
+      <h4>Состояние и данные в SPA</h4>
+      <ul>
+        <li>Локальное состояние (hooks/pinia/zustand) для UI-мелочей.</li>
+        <li>Глобальное состояние (Redux/RTK Query, Vuex) для кросс-страничных данных.</li>
+        <li>Клиентские кэши API (SWR/React Query) для фетчинга/инвалидации.</li>
+        <li>Реактивность в реальном времени: WebSocket/SSE для бронирований/очередей.</li>
+      </ul>
+    </section>
+
+    <section id="1-4">
+      <h3>1.4. Архитектурные принципы и практики</h3>
+      <h4>Принципы проектирования</h4>
+      <ul>
+        <li>Single Responsibility: модуль делает одно дело.</li>
+        <li>Слабая связность, высокая связность внутри модуля.</li>
+        <li>Контракты и версии API (Semantic Versioning, OpenAPI).</li>
+        <li>12-Factor App: конфиги через env, неизменяемые билд-артефакты, логирование в stdout.</li>
+        <li>Безопасность по умолчанию: минимальные привилегии, защита секретов, HTTPS везде.</li>
+        <li>Наблюдаемость by design: корреляция запросов, idempotency-ключи.</li>
+      </ul>
+
+      <h4>Антипаттерны</h4>
+      <ul>
+        <li>Big Ball of Mud: свалка логики без границ.</li>
+        <li>Shared DB между сервисами: ломает независимость, блокирует эволюцию схемы.</li>
+        <li>Чрезмерная микросервисизация: дробление без нужды → накладные расходы.</li>
+        <li>Тяжёлый клиент без SSR там, где важен SEO/первый рендер.</li>
+      </ul>
+
+      <h4>Ключевые интеграционные решения</h4>
+      <ul>
+        <li>REST/JSON — дефолт для CRUD.</li>
+        <li>GraphQL — гибкая выборка, агрегация с фронта.</li>
+        <li>gRPC — межсервисные вызовы с высокой производительностью.</li>
+        <li>Событийная шина — decoupling, реакция на доменные события (Saga/Outbox).</li>
+      </ul>
+    </section>
+
+    <section id="1-5">
+      <h3>1.5. Пример «театр: репертуар и билеты» в трёх архитектурах</h3>
+      <h4>А. Монолит</h4>
+      <ul>
+        <li>Один сервер: /auth, /repertoire, /tickets, /payments.</li>
+        <li>Одна БД (PostgreSQL), схемы: users, events, seats, orders, payments.</li>
+        <li>Кэш Redis для списка репертуара.</li>
+        <li>Плюсы: проще студентам, единый деплой. Минусы: рост кода, единая точка отказа.</li>
+      </ul>
+      <h4>Б. Клиент–сервер</h4>
+      <ul>
+        <li>Frontend (Next.js): публичные страницы — SSR/ISR, кабинет — SPA/CSR.</li>
+        <li>Backend (Spring/Express): REST API + Swagger/OpenAPI.</li>
+        <li>Redis + CDN для картинок афиш.</li>
+        <li>RabbitMQ для писем/SMS ( фоновые задачи ).</li>
+        <li>Плюсы: чистая граница, гибкость в выборе рендера.</li>
+      </ul>
+      <h4>В. Микросервисы</h4>
+      <ul>
+        <li>auth, catalog, ticketing, payments, notifications.</li>
+        <li>API Gateway (rate-limit, JWT, A/B).</li>
+        <li>Kafka для событий: TicketReserved, PaymentCaptured, OrderExpired.</li>
+        <li>Разные БД: ticketing (Postgres), catalog (Mongo), payments (SQL + idempotency).</li>
+        <li>Плюсы: масштаб, отказоустойчивость. Минусы: сложнее студентам (но полезно «пощупать» на уровне схем).</li>
+      </ul>
+    </section>
+
+    <section id="1-6">
+      <h3>1.6. Нефункциональные требования и метрики (что проверять)</h3>
+      <ul>
+        <li>Производительность: P95 latency, ошибки 5xx, RPS/QPS, загрузка CPU/RAM.</li>
+        <li>Надёжность: SLO/SLA/SLI, MTTR/MTBF, бюджет ошибок.</li>
+        <li>Безопасность: покрытие аутентификации, роли/права, шифрование at-rest/in-transit, аудит.</li>
+        <li>Наблюдаемость: полнота логов, трассировка (trace id), дашборды (статус очередей, кэша).</li>
+        <li>Качество кода: линтеры, тесты (unit/integration/e2e), покрытия, статанализ.</li>
+      </ul>
+
+      <h4>Пример 1. Архитектурная заметка (монолит vs клиент–сервер)</h4>
+      <h5>Описание задания</h5>
+      <ul>
+        <li>Сформулируйте функционал MVP «театр» (5–7 пользовательских действий).</li>
+        <li>Нарисуйте схему слоёв и потоков данных для монолита и для клиент–серверного варианта.</li>
+        <li>Выпишите 5 рисков монолита для вашего MVP и 5 выгод клиент–сервера.</li>
+        <li>Зафиксируйте нефункциональные требования: пиковая нагрузка, RTO/RPO, требования к SEO.</li>
+      </ul>
+
+      <h5>Решение — функционал MVP (5–7 действий)</h5>
+      <ol>
+        <li>Поиск и просмотр репертуара (дата, жанр, театр/сцена).</li>
+        <li>Просмотр схемы зала и выбор мест.</li>
+        <li>Бронирование/покупка билетов (оформление заказа).</li>
+        <li>Оплата (редирект/виджет платёжного провайдера).</li>
+        <li>Получение электронного билета (PDF/QR на e-mail).</li>
+        <li>Личный кабинет: список заказов, повторная отправка билета.</li>
+        <li>Простейшая админка: CRUD спектаклей/сеансов/ценовых зон.</li>
+      </ol>
+
+      <h4 id="schemes">2) Схемы слоёв и потоков данных</h4>
+      <h5>2.1 Монолит (слои внутри одного приложения)</h5>
+      <pre class="mermaid">
+graph LR
+  A[Пользователь - браузер или моб веб] -->|HTTP| UI[UI слой - шаблоны SSR]
+  subgraph MONO[Монолитное приложение]
+    UI --> APP[Прикладная логика - контроллеры и сервисы]
+    APP --> DOM[Доменная модель - сеанс, место, заказ]
+    DOM --> REPO[Доступ к данным - ORM, репозитории]
+    REPO --> DB[(Реляционная БД)]
+    APP --> PAY[Интеграция - Платежный провайдер]
+    APP --> MAIL[Интеграция - Email и SMS]
+    APP --> PDF[Генерация PDF и QR]
+  end
+  A <-->|HTML / SSR| UI
+  PAY --> APP
+  MAIL --> APP
+  PDF --> UI
+      </pre>
+      <p><em>Потоки (пример):</em> A→UI: поиск сеансов → APP/DOM/REPO→DB → UI: список; A→UI: выбор мест → APP блокировка → REPO→DB; APP→PAY: оплата; PAY→APP: статус; APP→PDF: билет; APP→MAIL: отправка.</p>
+
+      <h5>2.2 Клиент–сервер (явный backend API)</h5>
+      <pre class="mermaid">
+graph LR
+  C[Клиент - SPA или SSR веб] -->|REST или GraphQL| API[Backend API]
+  subgraph BACKEND[Серверная часть]
+    API --> SVC[Бизнес логика - сервисы]
+    SVC --> DAL[Доступ к данным]
+    DAL --> DB[(Реляционная БД)]
+    SVC --> CACHE[(Кэш)]
+    SVC --> PAY[Платежный провайдер]
+    SVC --> MAIL[Почтовый сервис]
+    SVC --> DOCS[Генератор PDF и QR]
+  end
+  C <-->|HTML или JSON| API
+  PAY --> SVC
+  MAIL --> SVC
+  DOCS --> API
+      </pre>
+
+      <h4>3) Риски монолита (для данного MVP)</h4>
+      <ul>
+        <li>Связанные релизы: единое развёртывание — любая правка (даже письма) требует полного релиза и окна простоя.</li>
+        <li>Масштабирование “вместе”: пик на оплате/генерации PDF тянет весь процесс, сложнее масштабировать узкие места.</li>
+        <li>Границы модулей размыты: риск “боковых эффектов”, регрессий при доработке домена/ORM.</li>
+        <li>Ограниченная технологическая свобода: трудно выделить, например, генерацию билетов на иной стек/воркер.</li>
+        <li>Нагрузочная конкуренция за БД: в пиковые минуты (старт продаж) блокировки транзакций/эскалации блокировок.</li>
+      </ul>
+
+      <h4>4) Выгоды клиент–сервера</h4>
+      <ul>
+        <li>Чёткое разделение интерфейса и API: переиспользуем тот же backend для веба/мобайла/кассы.</li>
+        <li>Независимое масштабирование: отдельно API, кэш, генерацию PDF/очереди.</li>
+        <li>Лучшие перформанс-паттерны: кэш слоёв, CDN для статики, тонкие JSON-ответы.</li>
+        <li>Удобная интеграция: webhooks платежей, почта, аналитика — не мешают UI.</li>
+        <li>Безопасность и политика доступа: токены, rate-limit, WAF перед API.</li>
+      </ul>
+
+      <h4>5) Нефункциональные требования (пример фиксации для MVP)</h4>
+      <p><strong>Нагрузка и производительность</strong></p>
+      <ul>
+        <li>Пиковая одновременная аудитория: 2 000 пользователей в 10-минутном окне старта продаж.</li>
+        <li>Пиковый RPS на чтение: 150–200 req/s (каталог/схемы мест) при кэшировании.</li>
+        <li>Пиковый RPS на запись (заказы): 15–30 req/s с гарантией целостности броней.</li>
+        <li>Время отклика P95: чтение каталога/сеансов ≤ 300 мс; проверка/блокировка мест ≤ 500 мс; подтверждение успешной оплаты (после колбэка) ≤ 2 с.</li>
+      </ul>
+      <p><strong>Надёжность и восстановление</strong></p>
+      <ul>
+        <li>Доступность целевого контура (в рабочее время продаж): ≥ 99.5%.</li>
+        <li>RTO: ≤ 30 минут. RPO: ≤ 5 минут (журналирование + реплика).</li>
+        <li>Резервирование: БД с синхронной репликой, ежедневные снапшоты; очереди/ретраи для e-mail и PDF.</li>
+      </ul>
+      <p><strong>SEO (даже для MVP)</strong></p>
+      <ul>
+        <li>Отдача серверного HTML для ключевых страниц: афиша, страница спектакля, страница сеанса (SSR/SSG).</li>
+        <li>Технические метаданные: title/description/og:*/twitter cards; hreflang при мультиязычности.</li>
+        <li>Структурированные данные schema.org: Event, PerformingArtsTheater, Offer (seance/price).</li>
+        <li>Карта сайта и robots: /sitemap.xml, корректный robots.txt, каноникал.</li>
+        <li>Веб-показатели: LCP ≤ 2.5 с, CLS ≤ 0.1, INP ≤ 200 мс на афише и карточке спектакля.</li>
+        <li>ЧПУ-ссылки: /repertoire/hamlet-2025-03-21-19-00, без параметров в основной индексации.</li>
+      </ul>
+
+      <h3>Пример 2. SPA-стратегия рендера</h3>
+      <h4>Описание задания</h4>
+      <ol>
+        <li>Определите, какие страницы должны быть SSR/ISR (афиша, событие), а какие SPA/CSR (корзина, кабинет).</li>
+        <li>Опишите кэш-политику: CDN (статические), Redis (частые запросы), браузерный кэш (ETag/Cache-Control).</li>
+        <li>Пропишите маршруты и состояние (что хранится локально, что подтягивается из API, где нужна подписка на события).</li>
+      </ol>
+
+      <h4>Решение</h4>
+      <table>
+        <thead><tr><th>Страница/раздел</th><th>Режим</th><th>Зачем так</th></tr></thead>
+        <tbody>
+          <tr><td>Афиша (/repertoire, пагинация/фильтры)</td><td>ISR (SSG c периодической ревалидацией)</td><td>SEO + быстрый TTFB, данные меняются не каждую минуту. Ревалидация 60–300 сек.</td></tr>
+          <tr><td>Событие/спектакль (/event/{slug})</td><td>ISR</td><td>Богатые мета-теги, шаринг, стабильный контент (описание/постер). Ревалидация 300–900 сек.</td></tr>
+          <tr><td>Сеанс (/event/{slug}/{date-time}) — цены, наличие мест</td><td>SSR</td><td>Нужна «свежесть» и индексация (rich snippets Offer). Плюс гибрид: после SSR — лайв-обновления мест через WS/SSE.</td></tr>
+          <tr><td>Схема зала / выбор мест (/seats/{sessionId})</td><td>CSR (SPA)</td><td>Много интерактива, частые инкрементальные обновления занятых мест.</td></tr>
+          <tr><td>Корзина (/cart)</td><td>CSR (SPA)</td><td>Локальное состояние, мгновенные UX-операции.</td></tr>
+          <tr><td>Оформление заказа/оплата (/checkout)</td><td>CSR + server actions</td><td>Клиентские формы + серверные атомарные операции (резерв/проверки).</td></tr>
+          <tr><td>Личный кабинет (/account, /orders)</td><td>CSR (с защищённым SSR-контейнером при желании)</td><td>Данные частные, не индексируются; быстрые API-запросы после аутентификации.</td></tr>
+          <tr><td>Админка (/admin/*)</td><td>CSR</td><td>Внутренний инструмент, не для SEO.</td></tr>
+          <tr><td>Статические (/about, /contacts, /policy)</td><td>SSG/ISR</td><td>Чистая статика через CDN.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Кэш-политика</h4>
+      <ul>
+        <li><strong>CDN (ассеты):</strong> Cache-Control: public, max-age=31536000, immutable (с хешами).</li>
+        <li><strong>Статические HTML (ISR):</strong> Cache-Control: public, s-maxage=300, stale-while-revalidate=120.</li>
+        <li><strong>Redis:</strong> ключи и TTL: shows:list:v{n}:{yymmdd?}:{filtersHash} → 60–180 с; event:{slug} → 300–900 с; session:{id}:prices → 300 с; session:{id}:availability → 5–15 с; seat:lock:{sessionId}:{seatId} → TTL = 7–10 мин; orders:stats:{day} → 300 с.</li>
+        <li><strong>Политика Redis:</strong> cache-aside; инвалидируем по изменениям.</li>
+        <li><strong>Браузерный кэш:</strong> HTML динамики — no-store; API GET — private, max-age=30, ETag+304; каталоги — ETag + stale-while-revalidate через CDN.</li>
+        <li><strong>Service Worker (опц.):</strong> runtime-кэш картинок зала/постеров (LRU ~50–100).</li>
+      </ul>
+
+      <h4>Маршруты и данные</h4>
+      <ul>
+        <li><strong>GET /repertoire</strong> (ISR + Redis 60–180 с) — список спектаклей/сеансов; фильтры.</li>
+        <li><strong>GET /event/{slug}</strong> (ISR + Redis 300–900 с) — описание, длительность, возраст, изображения, ближайшие сеансы.</li>
+        <li><strong>GET /event/{slug}/{date-time}</strong> (SSR) — цены по зонам, остатки мест; после загрузки — подписка WS/SSE.</li>
+        <li><strong>GET /seats/{sessionId}</strong> (CSR): API — seats, lock, release; WS/SSE для seat_updates:{sessionId}.</li>
+        <li><strong>GET /cart</strong> (CSR) — локально: seats[], lockId, coupon; API — пересчёт.</li>
+        <li><strong>POST /checkout</strong> (CSR + server actions) — валидация lock → orderId → paymentId/redirectUrl.</li>
+        <li><strong>GET /payment/callback</strong> — сервер финализирует заказ → билет → результат.</li>
+        <li><strong>GET /account</strong> (CSR защищённый) — /api/me, /api/orders?limit=… (ETag, private, max-age=30).</li>
+        <li><strong>GET /admin/*</strong> — CRUD, инвалидирует Redis по паттернам.</li>
+      </ul>
+
+      <h4>Где хранить состояние</h4>
+      <ul>
+        <li><strong>Локально:</strong> localStorage/IndexedDB (фильтры, последний просмотр, корзина, access-token — лучше httpOnly cookie).</li>
+        <li><strong>In-memory:</strong> Redux/Zustand/Query cache.</li>
+        <li><strong>Сервер/Бэкенд:</strong> БД (источник истины), Redis (локи и агрегаты); PDF/QR — S3 + подписанные ссылки.</li>
+        <li><strong>Подписки/события:</strong> WS/SSE, webhooks провайдера, очередь (Rabbit/Kafka).</li>
+      </ul>
+
+      <h4>Примеры заголовков и ключей</h4>
+      <ul>
+        <li><strong>API (GET):</strong> Cache-Control: private, max-age=30, stale-while-revalidate=30; ETag: "v3-&lt;hash&gt;".</li>
+        <li><strong>HTML CSR:</strong> Cache-Control: no-store.</li>
+        <li><strong>ISR через CDN:</strong> Cache-Control: public, s-maxage=300, stale-while-revalidate=120.</li>
+        <li><strong>Redis ключи:</strong> shows:list:v3:{yyyymm}:{filtersHash}, event:v2:{slug}, session:{id}:availability, session:{id}:prices, lock:{sessionId}:{seatId} → TTL 10m.</li>
+      </ul>
+
+      <h4>SEO-нюансы в SPA-контуре</h4>
+      <ul>
+        <li>SSR/ISR афиша/событие/сеанс (title/description/OG + schema.org Event/Offer).</li>
+        <li>Каноникал на сеанс; UTM/параметры убирать из каноникала.</li>
+        <li>noindex для корзины/кабинета.</li>
+      </ul>
+
+      <h4>Политика ошибок и деградаций</h4>
+      <ul>
+        <li>Если WS/SSE недоступны — поллинг /api/sessions/{id}/availability?since=ts каждые 5–10 с.</li>
+        <li>Если Redis недоступен — прямые запросы в БД + агрессивный CDN для афиши/событий.</li>
+        <li>Если генерация PDF занята — заказ «в обработке», письмо догоняет по событию.</li>
+      </ul>
+
+      <h3 id="evolution">Пример 3. эволюция к микросервисам (мысленный эксперимент)</h3>
+      <h4>Описание задания</h4>
+      <ol>
+        <li>Разбейте монолит на 3 сервиса (логическое разделение по доменам).</li>
+        <li>Составьте список доменных событий и их схемы (JSON).</li>
+        <li>Объясните, как решается проблема согласованности заказа билета (сага/таймаут резерва).</li>
+      </ol>
+
+      <h4>Решение — 1) Декомпозиция монолита → 3 доменных сервиса</h4>
+      <ul>
+        <li><strong>Catalog (Репертуар и сеансы):</strong> хранит спектакли, даты, сцены, ценовые зоны, базовые квоты; только чтение для клиентов; источник истины по расписанию и ценам.</li>
+        <li><strong>Reservations (Места и брони):</strong> инвентарь мест на сеанс: блокировки (TTL), освобождение, продажа; владелец состояний free | locked | sold; генерирует события.</li>
+        <li><strong>Orders (Заказы и оплата):</strong> создание/подтверждение заказа, интеграция с платёжным провайдером; сага заказа; триггер генерации билетов и уведомлений.</li>
+      </ul>
+      <p>Веб-клиент ходит к Orders API (создать заказ) и Reservations API (получить схему/заблокировать места), читает афишу из Catalog API. Источник истины: цены/сеансы — Catalog; состояние мест — Reservations; статус заказа/оплаты — Orders.</p>
+
+      <h4>2) Доменные события и их полезная нагрузка</h4>
+      <details>
+        <summary>Метаданные событий (общие поля)</summary>
+        <pre><code>{
+  "event_id": "uuid",
+  "event_type": "string",
+  "occurred_at": "2025-11-04T12:00:00Z",
+  "producer": "service-name",
+  "correlation_id": "uuid",
+  "causation_id": "uuid",
+  "schema_version": 1
+}
+</code></pre>
+      </details>
+
+      <details>
+        <summary>session_published (Catalog → прогрев кэшей)</summary>
+        <pre><code>{
+  "event_type": "session_published",
+  "session": {
+    "id": "sess_123",
+    "event_id": "ev_456",
+    "starts_at": "2025-12-20T19:00:00Z",
+    "hall_id": "hall_a",
+    "price_zones": [
+      {"zone_id": "parter_a", "price": 3500, "currency": "RUB"}
+    ]
+  }
+}
+</code></pre>
+      </details>
+
+      <details>
+        <summary>seats_locked (Reservations → Orders/Client)</summary>
+        <pre><code>{
+  "event_type": "seats_locked",
+  "lock": {
+    "lock_id": "lock_789",
+    "session_id": "sess_123",
+    "seats": [{"row": "A", "seat": 10}, {"row": "A", "seat": 11}],
+    "expires_at": "2025-11-04T12:10:00Z"
+  }
+}
+</code></pre>
+      </details>
+
+      <details>
+        <summary>order_created / payment_succeeded / seats_sold / order_confirmed</summary>
+        <pre><code>{
+  "event_type": "order_created",
+  "order": {
+    "order_id": "ord_101",
+    "user_id": "usr_5",
+    "session_id": "sess_123",
+    "lock_id": "lock_789",
+    "amount": 7000,
+    "currency": "RUB",
+    "status": "pending"
+  }
+}
+---
+{
+  "event_type": "payment_succeeded",
+  "payment": {
+    "order_id": "ord_101",
+    "payment_id": "pay_202",
+    "provider": "tinkoff",
+    "paid_at": "2025-11-04T12:05:00Z",
+    "amount": 7000,
+    "currency": "RUB"
+  }
+}
+---
+{
+  "event_type": "seats_sold",
+  "sale": {
+    "order_id": "ord_101",
+    "session_id": "sess_123",
+    "seats": [{"row": "A", "seat": 10}, {"row": "A", "seat": 11}]
+  }
+}
+---
+{
+  "event_type": "order_confirmed",
+  "order": {
+    "order_id": "ord_101",
+    "tickets": [
+      {"ticket_id": "tck_1", "qr_ref": "qr_1"},
+      {"ticket_id": "tck_2", "qr_ref": "qr_2"}
+    ],
+    "delivered": false
+  }
+}
+</code></pre>
+      </details>
+
+      <h4>3) Согласованность заказа: сага + таймаут резерва</h4>
+      <p><strong>Ключевая идея:</strong> единственный источник истины по местам — сервис Reservations; заказ может существовать только с валидным <code>lock_id</code>; согласованность достигается сагой: серия локальных транзакций + компенсации при сбое.</p>
+
+      <h5>Вариант A: Orchestrator (централизованная сага в Orders)</h5>
+      <ol>
+        <li>Клиент выбирает места → Reservations.lockSeats → lock_id (TTL 10 мин).</li>
+        <li>Клиент создаёт заказ → Orders.createOrder(lock_id) (Orders проверяет lock в Reservations).</li>
+        <li>Orders.initiatePayment → провайдер.</li>
+        <li>Получен payment_succeeded (вебхук).</li>
+        <li>Orders.confirmOrder → вызывает Reservations.sellSeats(order_id, lock_id).</li>
+        <li>Если sellSeats успешно → seats_sold → Orders фиксирует order_confirmed, запускает билеты/почту.</li>
+        <li>Компенсации: при провале или таймауте — cancelOrder / refund / releaseLock.</li>
+      </ol>
+      <p><strong>Проблема двойной продажи?</strong> Исключает Reservations: пока sellSeats не переведёт сиденья в sold, они остаются в locked. Идемпотентность: sellSeats(order_id, lock_id) с дедупликацией по order_id.</p>
+
+      <h5>Вариант B: Choreography (реактивные события)</h5>
+      <ul>
+        <li>Orders публикует order_created → Reservations валидирует lock_id и публикует seats_reserved/или reservation_rejected → Orders при seats_reserved инициирует оплату; при payment_succeeded Reservations отвечает seats_sold; компенсации — по событиям payment_failed/seats_lock_expired.</li>
+      </ul>
+      <p><strong>Для MVP проще Orchestrator:</strong> меньше гонок, явные шаги/ошибки.</p>
+
+      <h5>Таймаут резерва (TTL)</h5>
+      <ul>
+        <li>Блокировка создаётся в Reservations с жёстким TTL (например, 10 минут); по истечении эмитится seats_lock_expired и переводятся места в free.</li>
+        <li>Orders подписан на seats_lock_expired: если заказ pending — помечает expired и не допускает оплату.</li>
+        <li>UI показывает обратный отсчёт (из expires_at).</li>
+      </ul>
+
+      <h5>Технические приёмы надёжности</h5>
+      <ul>
+        <li>Outbox + транзакционный инбокс; идемпотентные команды; dedup-store; компенсации (cancel/refund/release).</li>
+        <li>Граница согласованности: «оплачено» и «продано» могут быть рассинхронены секунды; UI всегда актуализируется через WS/SSE и статус заказа.</li>
+      </ul>
+
+      <h3 id="contracts">4) Мини-контракты API (эскиз)</h3>
+      <details>
+        <summary>Reservations</summary>
+        <pre><code>POST /locks {session_id, seats[]} → {lock_id, expires_at}
+POST /locks/{lock_id}/release
+POST /sales {order_id, lock_id} → 200 + события seats_sold
+</code></pre>
+      </details>
+      <details>
+        <summary>Orders</summary>
+        <pre><code>POST /orders {session_id, lock_id, customer} → {order_id, status: "pending"}
+POST /orders/{order_id}/pay → {payment_id, redirect_url}
+POST /payments/webhook (провайдер)
+POST /orders/{order_id}/cancel
+</code></pre>
+      </details>
+      <details>
+        <summary>Catalog</summary>
+        <pre><code>GET /events, GET /events/{slug}, GET /sessions/{id}
+</code></pre>
+      </details>
+    </section>
+
+    <section id="c4">
+      <h3>1.7. Диаграммы проектирования: C4-модель архитектуры</h3>
+      <p>Понятие и назначение. C4-модель — современный способ документирования архитектуры программных систем (Context, Container, Component, Code).</p>
+
+      <h4>Основные принципы C4-модели</h4>
+      <ol>
+        <li>Единообразие.</li>
+        <li>Простота.</li>
+        <li>Фокусировка.</li>
+        <li>Прослеживаемость.</li>
+        <li>Автоматизация.</li>
+      </ol>
+
+      <h4>Пример: веб-приложение «Театр: репертуар и билеты»</h4>
+      <h5>C1 — Context Diagram</h5>
+      <pre class="mermaid">
+flowchart LR
+  subgraph External
+    U[Пользователь]:::actor
+    Admin[Администратор театра]:::actor
+    Pay[Платёжный шлюз]:::system
+  end
+
+  subgraph System["Информационная система «Театр»"]
+    WebApp[Веб-приложение]:::system
+  end
+
+  U -->|Покупает билет, смотрит афишу| WebApp
+  Admin -->|Управляет репертуаром| WebApp
+  WebApp -->|Отправляет оплату| Pay
+  Pay -->|Возврат статуса оплаты| WebApp
+
+  classDef actor fill:#FEE,stroke:#000;
+  classDef system fill:#EFF,stroke:#000;
+      </pre>
+
+      <h5>C2 — Container Diagram</h5>
+      <pre class="mermaid">
+flowchart LR
+  subgraph TheatreSystem["Система «Театр»"]
+    Frontend[Frontend - React NextJS]:::frontend
+    Backend[Backend - Express API]:::backend
+    DB[(PostgreSQL Database)]:::db
+    Cache[(Redis Cache)]:::db
+  end
+
+  Frontend -->|HTTP REST| Backend
+  Backend -->|SQL| DB
+  Backend -->|Cache or Session| Cache
+
+  classDef frontend fill:#E6F7FF,stroke:#007ACC;
+  classDef backend fill:#FFF5E6,stroke:#FF6600;
+  classDef db fill:#E6FFE6,stroke:#339933;
+      </pre>
+
+      <h5>C3 — Component Diagram (для Backend)</h5>
+      <pre class="mermaid">
+flowchart LR
+  subgraph Backend["Backend (Express API)"]
+    Auth[AuthController]:::component
+    Rep[RepertoireController]:::component
+    Tickets[TicketsController]:::component
+    ServiceLayer[Service Layer]:::component
+    RepoLayer[Repository Layer]:::component
+  end
+
+  Auth --> ServiceLayer
+  Rep --> ServiceLayer
+  Tickets --> ServiceLayer
+  ServiceLayer --> RepoLayer
+  RepoLayer --> DB[(Database)]
+
+  classDef component fill:#FFF0F5,stroke:#CC0066;
+      </pre>
+
+      <h5>C4 — Code Diagram</h5>
+      <pre class="mermaid">
+classDiagram
+  class TicketService {
+    +createOrder(userId, eventId, seatId)
+    +cancelOrder(orderId)
+    +getUserOrders(userId)
+  }
+
+  class TicketRepository {
+    +save(order)
+    +findByUser(userId)
+    +delete(orderId)
+  }
+
+  TicketService --> TicketRepository
+      </pre>
+
+      <h4>Работа с C4-диаграммами</h4>
+      <table>
+        <thead><tr><th>Этап</th><th>Что делает студент</th><th>Формат представления</th></tr></thead>
+        <tbody>
+          <tr><td>C1</td><td>Определяет границы системы, акторов, внешние сервисы</td><td>Context-диаграмма (Mermaid/PlantUML)</td></tr>
+          <tr><td>C2</td><td>Делит систему на контейнеры: frontend, backend, база данных и др.</td><td>Container-диаграмма</td></tr>
+          <tr><td>C3</td><td>Расписывает ключевые модули внутри контейнера (API, сервисы, репозитории)</td><td>Component-диаграмма</td></tr>
+          <tr><td>C4</td><td>Иллюстрирует один выбранный компонент на уровне классов/функций</td><td>Code-диаграмма</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Пример — Context вашей предметной области</h4>
+      <pre class="mermaid">
+flowchart LR
+  %% Внешние акторы и системы
+  User[Покупатель]
+  Admin[Администратор театра]
+  Cashier[Касса офлайн]
+  Pay[Платежный провайдер]
+  Mail[Почтовый сервис]
+  SMS[SMS сервис]
+  OAuth[OAuth провайдеры]
+  Analytics[Система веб аналитики]
+
+  %% Граница системы
+  subgraph TheatreOnline["Система Театр Онлайн"]
+    System[Портал продажи билетов]
+  end
+
+  %% Потоки взаимодействий
+  User <--> |просмотр афиши, выбор мест, оплата| System
+  Admin <--> |управление репертуаром и ценами| System
+  Cashier <--> |резерв мест и проверка заказов| System
+
+  System --> |инициация оплаты| Pay
+  Pay --> |статус оплаты| System
+
+  System --> |письма билеты и квитанции| Mail
+  System --> |уведомления| SMS
+
+  System <--> |вход через соц логин| OAuth
+  System --> |события просмотры конверсии| Analytics
+      </pre>
+
+      <h4>Пример — 3–4 контейнера</h4>
+      <pre class="mermaid">
+flowchart TB
+  %% Внешние акторы
+  User[Покупатель]
+  Admin[Администратор театра]
+  Pay[Платежный провайдер]
+  Mail[Почтовый сервис]
+  Analytics[Веб аналитика]
+
+  %% Контейнеры системы
+  subgraph TheatreOnline["Система Театр Онлайн"]
+    Frontend[Frontend - SPA или SSR NextJS React]
+    Backend[Backend API - NodeJS Express Nest]
+    DB[(PostgreSQL Database)]
+    Cache[(Redis Cache Sessions)]
+    Bus[(Event Bus RabbitMQ или Kafka)]
+  end
+
+  %% Связи акторов и контейнеров
+  User -->|HTTP или HTTPS| Frontend
+  Admin -->|Веб интерфейс| Frontend
+
+  Frontend -->|REST или GraphQL| Backend
+  Backend -->|SQL запросы| DB
+  Backend -->|Кэш и очереди| Cache
+  Backend -->|Публикация событий| Bus
+  Bus --> Backend
+  Backend -->|Webhook оплаты| Pay
+  Backend -->|Уведомления| Mail
+  Frontend -->|Метрики| Analytics
+
+  %% Стили
+  classDef frontend fill:#E6F7FF,stroke:#007ACC;
+  classDef backend fill:#FFF5E6,stroke:#FF6600;
+  classDef storage fill:#E6FFE6,stroke:#339933;
+  classDef bus fill:#F5E6FF,stroke:#9933FF;
+  classDef external fill:#F2F2F2,stroke:#999999;
+
+  class Frontend frontend;
+  class Backend backend;
+  class DB,Cache storage;
+  class Bus bus;
+  class User,Admin,Pay,Mail,Analytics external;
+      </pre>
+
+      <h4>Структура backend (3–5 компонентов)</h4>
+      <pre class="mermaid">
+flowchart LR
+  subgraph Backend["Backend"]
+    API[API Layer - HTTP]
+    SVC[Domain Services]
+    DAL[Data Access Layer]
+    EXT[Integrations]
+    EVT[Eventing - Outbox and Consumers]
+  end
+
+  subgraph Storage["Storage"]
+    DB[(PostgreSQL)]
+    Cache[(Redis)]
+    Bus[(Event Bus)]
+  end
+
+  API --> SVC
+  SVC --> DAL
+  DAL --> DB
+  DAL --> Cache
+  SVC --> EXT
+  SVC --> EVT
+  EVT --> Bus
+      </pre>
+ <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    // Init WITHOUT auto-run
+    mermaid.initialize({ startOnLoad: false, securityLevel: "loose", theme: "default" });
+
+    function sanitizeMermaidText(el){
+      // Normalize NBSP and CRLF that often break classDiagram on paste
+      const raw = el.textContent;
+      const cleaned = raw
+        .replace(/\u00A0/g, ' ')
+        .replace(/\r\n/g, '\n')
+        .replace(/\t/g, '  ')
+        .trim();
+      // Only write back if changed (avoids flicker)
+      if (cleaned !== raw) el.textContent = cleaned;
+    }
+
+    function renderMermaids(root){
+      if (!root) root = document;
+      const nodes = root.querySelectorAll('.mermaid');
+      nodes.forEach(sanitizeMermaidText);
+      if (typeof mermaid.run === 'function'){
+        mermaid.run({ querySelector: '.mermaid' });
+      } else if (typeof mermaid.init === 'function'){
+        mermaid.init(undefined, nodes);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      renderMermaids(document);
+      document.querySelectorAll('details').forEach(d => {
+        d.addEventListener('toggle', () => { if (d.open) renderMermaids(d); });
+      });
+    });
+  </script>
+      <h4>Code-диаграмма компонента ReservationService</h4>
+ <div class="mermaid">
+classDiagram
+direction LR
+
+class ReservationService {
+  +lockSeats(sessionId: string, seats: SeatId[], ttlSec: int): LockDTO
+  +releaseLock(lockId: string): void
+  +sellSeats(orderId: string, lockId: string): SaleResult
+  +getAvailability(sessionId: string): AvailabilityDTO
+}
+
+class LockManager {
+  +createLock(sessionId: string, seats: SeatId[], ttlSec: int): Lock
+  +extendLock(lockId: string, ttlSec: int): Lock
+  +expireLocks(): void
+}
+
+class SeatRepository {
+  +getSeatsBySession(sessionId: string): Seat[]
+  +getSeatState(sessionId: string, seat: SeatId): SeatState
+  +markSold(sessionId: string, seats: SeatId[], orderId: string): SaleResult
+}
+
+class LockRepository {
+  +save(lock: Lock): void
+  +find(lockId: string): Lock
+  +delete(lockId: string): void
+}
+
+class SessionRepository {
+  +find(sessionId: string): Session
+}
+
+class EventPublisher {
+  +publish(event: DomainEvent): void
+}
+
+class DomainEvent {
+  <<interface>>
+  +eventId: string
+  +type: string
+  +occurredAt: Instant
+  +correlationId: string
+}
+
+class Seat {
+  +sessionId: string
+  +row: string
+  +num: int
+  +state: SeatState
+}
+
+class Lock {
+  +lockId: string
+  +sessionId: string
+  +seats: SeatId[]
+  +expiresAt: Instant
+  +status: LockStatus
+  +orderId: string
+}
+
+class SeatState {
+  <<enumeration>>
+  FREE
+  LOCKED
+  SOLD
+}
+
+class LockStatus {
+  <<enumeration>>
+  ACTIVE
+  EXPIRED
+  RELEASED
+}
+
+ReservationService --> SeatRepository
+ReservationService --> LockRepository
+ReservationService --> SessionRepository
+ReservationService --> LockManager
+ReservationService --> EventPublisher
+LockManager --> LockRepository
+SeatRepository --> Seat
+LockRepository --> Lock
+ReservationService ..> DomainEvent
+EventPublisher ..> DomainEvent
+  </div>
+      <h4>Назначение уровней, технологии, типы связей</h4>
+      <ul>
+        <li><strong>API Layer (Уровень представления и интерфейсов):</strong> маршрутизация, валидация, security, форматы ответов. Зависит от Domain Services.</li>
+        <li><strong>Domain / Application Services:</strong> бизнес-инварианты, саги/компенсации. Транзакции через DAL; кэш — каталог/агрегаты.</li>
+        <li><strong>Data Access Layer:</strong> репозитории (Event/Session/Seat/Order/Lock), транзакции, cache-aside.</li>
+        <li><strong>Integrations:</strong> PaymentClient/Mailer/PdfGenerator/OAuthClient; таймауты/ретраи/идемпотентность.</li>
+        <li><strong>Eventing:</strong> Outbox, консьюмеры очередей, dedupe.</li>
+      </ul>
+      <ul>
+        <li><strong>Технологии:</strong> Node.js, Express/NestJS, JOI/Zod, TypeScript, Prisma/TypeORM/Knex, PostgreSQL, Redis, RabbitMQ/Kafka, BullMQ/Agenda, OAuth2, PDFKit/Puppeteer.</li>
+      </ul>
+      <ul>
+        <li><strong>Синхронные:</strong> HTTP(S) (Frontend→Backend), SQL (Backend→DB), TCP (Backend→Redis), HTTP (Backend→Payment).</li>
+        <li><strong>Асинхронные:</strong> AMQP/Kafka (Bus), Webhook (Payment→Backend), Job queue (mailer/pdf).</li>
+      </ul>
+
+      <h4>Примеры потоков данных</h4>
+      <ol>
+        <li>POST /locks → ReservationService (Redis TTL).</li>
+        <li>POST /orders → OrderService (PostgreSQL).</li>
+        <li>OrderService → платёжный API → paymentId/redirectUrl.</li>
+        <li>Провайдер → POST /payments/webhook → payment_succeeded.</li>
+        <li>Orders публикует событие → Reservations фиксирует seats_sold → Orders подтверждает → Mailer отправляет билет.</li>
+      </ol>
+    </section>
+
+    <section id="data">
+      <h3>1.8. Моделирование данных</h3>
+      <p>Моделирование данных — процесс описания информационной структуры системы: сущности, связи, атрибуты; цели: целостность, согласованность, эффективность.</p>
+
+      <h4>1.8.1. ER-модель</h4>
+      <p>Элементы, типы связей и пример ER-модели:</p>
+      <pre class="mermaid">
+erDiagram
+  USER {
+    int id
+    string full_name
+    string email
+    string phone
+  }
+
+  EVENT {
+    int id
+    string title
+    datetime date_time
+    string hall
+  }
+
+  SEAT {
+    int id
+    string row
+    string seat_number
+  }
+
+  TICKET {
+    int id
+    int price
+    string status
+  }
+
+  ORDER {
+    int id
+    datetime created_at
+    string payment_status
+  }
+
+  USER   ||--o{ ORDER  : ""
+  ORDER  ||--|{ TICKET : ""
+  TICKET }o--|| EVENT  : ""
+  EVENT  ||--o{ SEAT   : ""
+      </pre>
+
+      <h4>1.8.2. Нормализация данных</h4>
+      <p>1НФ: атомарность; 2НФ: зависимость от полного ключа; 3НФ: отсутствие транзитивных зависимостей. Пример: event_name/event_date не хранить в ORDER, а вынести в EVENT и связать по event_id.</p>
+
+      <h4>1.8.3. Формат JSON</h4>
+      <details>
+        <summary>Пример JSON-запроса и ответа (покупка билета)</summary>
+        <pre><code>POST /api/orders
+{
+  "user_id": 42,
+  "tickets": [
+    { "event_id": 5, "seat_id": 12 },
+    { "event_id": 5, "seat_id": 13 }
+  ],
+  "payment_method": "card"
+}
+---
+{
+  "order_id": 1205,
+  "status": "pending",
+  "created_at": "2025-11-04T14:25:00Z",
+  "total_price": 3400,
+  "tickets": [
+    { "ticket_id": 8801, "seat": "A12", "price": 1700 },
+    { "ticket_id": 8802, "seat": "A13", "price": 1700 }
+  ],
+  "payment_link": "https://pay.example.com/1205"
+}
+</code></pre>
+      </details>
+
+      <details>
+        <summary>Пример структуры данных в коде (JS/TS)</summary>
+        <pre><code>interface Ticket {
+  id: number;
+  event: string;
+  seat: string;
+  price: number;
+}
+
+interface Order {
+  id: number;
+  userId: number;
+  tickets: Ticket[];
+  totalPrice: number;
+  status: "pending" | "paid" | "canceled";
+}
+</code></pre>
+      </details>
+
+      <h4>1.8.4. JSON Schema</h4>
+      <details>
+        <summary>Схема для сущности Order</summary>
+        <pre><code>{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Order",
+  "type": "object",
+  "properties": {
+    "order_id": { "type": "integer" },
+    "user_id": { "type": "integer" },
+    "tickets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ticket_id": { "type": "integer" },
+          "event_id": { "type": "integer" },
+          "seat_id": { "type": "integer" }
+        },
+        "required": ["ticket_id", "event_id", "seat_id"]
+      }
+    },
+    "total_price": { "type": "number" },
+    "status": { "type": "string", "enum": ["pending", "paid", "canceled"] }
+  },
+  "required": ["order_id", "user_id", "tickets", "status"]
+}
+</code></pre>
+      </details>
+
+      <h4>1.8.5. Связь ER-модели и JSON</h4>
+      <p>ER-модель — структура хранения; JSON — формат обмена. Совпадает: userId↔USER.id; sessionId↔SESSION.id; seats(row,number)↔SEAT(row,number). Только ER: EVENT.genre, age_rating, SESSION.hall_name, SEAT.zone/price; TICKET.status/created_at. Только в JSON операции: payment (method/amount/currency) и client (userAgent/ip).</p>
+
+      <h4>Пример — ER на 5 сущностей (театр)</h4>
+      <pre class="mermaid">
+erDiagram
+  USER {
+    uuid id PK
+    string email
+    string name
+    string phone
+    datetime created_at
+  }
+
+  EVENT {
+    uuid id PK
+    string title
+    string genre
+    string age_rating
+    int duration_min
+  }
+
+  SESSION {
+    uuid id PK
+    uuid event_id FK
+    datetime starts_at
+    string hall_id
+    string hall_name
+  }
+
+  SEAT {
+    uuid id PK
+    uuid session_id FK
+    string row
+    int number
+    string zone
+    int price
+    string currency
+  }
+
+  TICKET {
+    uuid id PK
+    uuid user_id FK
+    uuid session_id FK
+    uuid seat_id FK
+    string status 
+    datetime created_at
+  }
+
+  EVENT   ||--o{ SESSION : has
+  SESSION ||--o{ SEAT    : has
+  USER    ||--o{ TICKET  : owns
+  SESSION ||--o{ TICKET  : for
+  SEAT    ||--o| TICKET  : assigned
+      </pre>
+
+      <h4>JSON-пример операции (создание заказа/билетов)</h4>
+      <details>
+        <summary>Запрос</summary>
+        <pre><code>{
+  "userId": "usr_7b8f7f7a-54a1-4d7d-8e8f-3e6a2c5f2b90",
+  "sessionId": "sess_5d9d1c1c-12a4-42fd-9b56-6f2c7f1e8a31",
+  "seats": [
+    { "row": "A", "number": 10 },
+    { "row": "A", "number": 11 }
+  ],
+  "payment": {
+    "method": "card",
+    "amount": 7000,
+    "currency": "RUB"
+  },
+  "client": {
+    "userAgent": "Mozilla/5.0",
+    "ip": "203.0.113.5"
+  }
+}
+</code></pre>
+      </details>
+
+      <h4>JSON Schema для проверки корректности структуры</h4>
+      <details>
+        <summary>Схема</summary>
+        <pre><code>{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/create-tickets.schema.json",
+  "title": "CreateTicketsRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "userId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "sessionId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "seats": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "row": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4,
+            "pattern": "^[A-ZА-Я0-9]+$"
+          },
+          "number": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          }
+        },
+        "required": ["row", "number"]
+      }
+    },
+    "payment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["card", "sbp", "applepay", "googlepay"]
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "currency": {
+          "type": "string",
+          "enum": ["RUB", "USD", "EUR"]
+        }
+      },
+      "required": ["method", "amount", "currency"]
+    },
+    "client": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "userAgent": { "type": "string" },
+        "ip": {
+          "type": "string",
+          "format": "ipv4"
+        }
+      }
+    }
+  },
+  "required": ["userId", "sessionId", "seats", "payment"]
+}
+</code></pre>
+      </details>
+
+      <h4>Сравнение ER и JSON</h4>
+      <ul>
+        <li><strong>Совпадает:</strong> userId ↔ USER.id; sessionId ↔ SESSION.id; seats(row,number) ↔ SEAT(row,number).</li>
+        <li><strong>Только ER:</strong> EVENT.genre/age_rating, SESSION.hall_name, SEAT.zone/price; TICKET.status/created_at.</li>
+        <li><strong>Только JSON (операция):</strong> payment (method/amount/currency), client (userAgent/ip).</li>
+      </ul>
+    </section>
+
+  </section>
+
+ 
+</div>
+</body>
+</html>

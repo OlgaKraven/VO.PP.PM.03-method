@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4. Основы оптимизации веб-приложений</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>4. Основы оптимизации веб-приложений</h1>
+      <nav class="toc">
+        <a href="#4-1">4.1 Метрики производительности (Web Vitals)</a>
+        <a href="#4-2">4.2 Инструменты анализа качества</a>
+        <a href="#4-3">4.3 Методы оптимизации</a>
+        <a href="#4-4">4.4 Критический путь рендеринга (CRP)</a>
+      </nav>
+    </header>
+
+    <!-- 4.1 -->
+    <section id="4-1">
+      <h2>4.1. Метрики производительности (Web Vitals)</h2>
+
+      <h3 id="4-1-1">4.1.1. Понятие и назначение</h3>
+      <p>Оптимизация веб-приложений — это комплекс мер, направленных на повышение скорости загрузки, стабильности отображения и отзывчивости интерфейса. Эти параметры напрямую влияют на UX (пользовательский опыт), SEO-рейтинг и доверие пользователя. Набор основных метрик качества взаимодействия — <strong>Core Web Vitals</strong> — измеряется инструментами Lighthouse, PageSpeed Insights, Chrome DevTools и WebPageTest.</p>
+
+      <h3 id="4-1-2">4.1.2. Основные показатели Web Vitals</h3>
+      <table>
+        <thead><tr><th>Метрика</th><th>Расшифровка</th><th>Что измеряет</th><th>Оптимальное значение</th></tr></thead>
+        <tbody>
+          <tr><td>LCP</td><td>Largest Contentful Paint</td><td>Скорость визуальной загрузки контента</td><td>&le; 2.5 сек</td></tr>
+          <tr><td>FID</td><td>First Input Delay</td><td>Задержка между первым действием и реакцией страницы</td><td>&le; 100 мс</td></tr>
+          <tr><td>CLS</td><td>Cumulative Layout Shift</td><td>Суммарное смещение элементов при загрузке</td><td>&le; 0.1</td></tr>
+          <tr><td>TTI</td><td>Time to Interactive</td><td>Когда сайт становится полностью интерактивным</td><td>&le; 5 сек</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="4-1-3">4.1.3. Метрика LCP (Largest Contentful Paint)</h3>
+      <p><strong>Что измеряет:</strong> время, за которое загружается и отображается наиболее значимый элемент страницы (изображение, заголовок, видео или блок текста).</p>
+      <p><strong>Типичные причины низкого LCP:</strong></p>
+      <ul>
+        <li>тяжёлые изображения без сжатия;</li>
+        <li>медленный серверный отклик (TTFB);</li>
+        <li>блокирующие CSS или JS-файлы;</li>
+        <li>отсутствие lazy-loading у медиа.</li>
+      </ul>
+      <p><strong>Способы оптимизации:</strong></p>
+      <pre><code class="language-html">&lt;!-- Использование современного формата --&gt;
+&lt;img src="poster.webp" alt="Афиша спектакля" width="800" height="600" loading="lazy"&gt;
+
+&lt;!-- Предварительная загрузка ключевого изображения --&gt;
+&lt;link rel="preload" as="image" href="poster.webp"&gt;</code></pre>
+      <div class="note"><p><strong>UX-комментарий:</strong> первое, что видит пользователь, должно появляться максимально быстро.</p></div>
+
+      <h3 id="4-1-4">4.1.4. Метрика FID (First Input Delay)</h3>
+      <p><strong>Что измеряет:</strong> время от первого взаимодействия до момента начала обработки события.</p>
+      <p><strong>Причины плохого FID:</strong></p>
+      <ul>
+        <li>«тяжёлый» JavaScript блокирует основной поток;</li>
+        <li>одновременные запросы и парсинг;</li>
+        <li>слишком большие bundle-файлы.</li>
+      </ul>
+      <p><strong>Решения:</strong></p>
+      <ul>
+        <li>делить код на модули (code splitting);</li>
+        <li>использовать <code>defer</code> и <code>async</code> для <code>&lt;script&gt;</code>;</li>
+        <li>переносить второстепенные скрипты в конец документа.</li>
+      </ul>
+      <pre><code class="language-html">&lt;script src="main.js" defer&gt;&lt;/script&gt;</code></pre>
+      <div class="note"><p><strong>Комментарий:</strong> пользователь должен сразу чувствовать отклик интерфейса, даже если не всё загружено.</p></div>
+
+      <h3 id="4-1-5">4.1.5. Метрика CLS (Cumulative Layout Shift)</h3>
+      <p><strong>Что измеряет:</strong> насколько сильно элементы «прыгают» во время загрузки.</p>
+      <p><strong>Причины:</strong></p>
+      <ul>
+        <li>изображения без указанных <code>width</code> и <code>height</code>;</li>
+        <li>отложенная подгрузка рекламы или <code>iframe</code>;</li>
+        <li>динамические вставки без зарезервированного пространства.</li>
+      </ul>
+      <pre><code class="language-html">&lt;!-- Плохо --&gt;
+&lt;img src="poster.jpg"&gt;
+
+&lt;!-- Хорошо --&gt;
+&lt;img src="poster.jpg" width="800" height="600" alt="Афиша спектакля"&gt;</code></pre>
+      <div class="note"><p><strong>Рекомендация:</strong> всегда резервируйте место под медиа-элементы, чтобы предотвратить визуальные скачки.</p></div>
+
+      <h3 id="4-1-6">4.1.6. Метрика TTI (Time To Interactive)</h3>
+      <p><strong>Что измеряет:</strong> время, через которое страница становится полностью интерактивной.</p>
+      <p><strong>Причины высокой TTI:</strong> перегруженные JS-файлы, рендер-блокирующие стили, одновременная загрузка всех модулей при старте.</p>
+      <p><strong>Решения:</strong></p>
+      <ul>
+        <li>lazy-load для несущественных компонентов;</li>
+        <li>разделение кода (<code>import()</code>, динамический импорт);</li>
+        <li>минимизация и кеширование ресурсов (<code>.min.js</code>, <code>.min.css</code>);</li>
+        <li>использование Service Worker для офлайн-кеша.</li>
+      </ul>
+      <pre><code class="language-js">// Пример динамического импорта
+document.getElementById("showBtn").addEventListener("click", async () =&gt; {
+  const { renderShows } = await import("./render.js");
+  renderShows();
+});</code></pre>
+
+      <h3 id="4-1-7">4.1.7. Инструменты измерения Web Vitals</h3>
+      <table>
+        <thead><tr><th>Инструмент</th><th>Описание</th><th>Где используется</th></tr></thead>
+        <tbody>
+          <tr><td>Lighthouse (Chrome DevTools)</td><td>Анализ производительности, доступности и SEO</td><td>Chrome → Lighthouse</td></tr>
+          <tr><td>PageSpeed Insights</td><td>Онлайн-проверка сайта от Google</td><td>pagespeed.web.dev</td></tr>
+          <tr><td>WebPageTest</td><td>Детализированные метрики загрузки</td><td>webpagetest.org</td></tr>
+          <tr><td>Core Web Vitals extension</td><td>Live-мониторинг</td><td>Расширение Chrome</td></tr>
+          <tr><td>Chrome UX Report (CrUX)</td><td>Статистика по реальным пользователям</td><td>API/BigQuery</td></tr>
+        </tbody>
+      </table>
+      <div class="note">
+        <p><strong>Пороговые значения:</strong> зелёная зона — «хорошо»; жёлтая — «нужно улучшить»; красная — «плохой UX».</p>
+      </div>
+
+      <h3 id="4-1-8">4.1.8. Влияние на UX и SEO</h3>
+      <table>
+        <thead><tr><th>Метрика</th><th>UX-влияние</th><th>SEO-эффект</th></tr></thead>
+        <tbody>
+          <tr><td>LCP</td><td>Быстрая визуальная загрузка — меньше отказов</td><td>Повышает видимость в поиске</td></tr>
+          <tr><td>FID</td><td>Ощущение отзывчивости и плавности</td><td>Влияет на Page Experience</td></tr>
+          <tr><td>CLS</td><td>Стабильность макета — меньше раздражения</td><td>Улучшает поведенческие метрики</td></tr>
+          <tr><td>TTI</td><td>Интерфейс готов к взаимодействию</td><td>Влияет на качество страницы</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="4-1-9">4.1.9. Рекомендации по оптимизации</h3>
+      <ol>
+        <li><strong>Оптимизация загрузки ресурсов</strong>
+          <ul>
+            <li>Сжимайте изображения (WebP, AVIF);</li>
+            <li>Минифицируйте HTML, CSS, JS;</li>
+            <li>Используйте CDN и HTTP/2;</li>
+            <li>Включайте кэширование (<code>Cache-Control</code>).</li>
+          </ul>
+        </li>
+        <li><strong>Улучшение JS-производительности</strong>
+          <ul>
+            <li>Разбивайте крупные скрипты;</li>
+            <li>Отложенная загрузка второстепенных модулей;</li>
+            <li>Используйте SSR при необходимости.</li>
+          </ul>
+        </li>
+        <li><strong>Оптимизация стилей</strong>
+          <ul>
+            <li>Удалите неиспользуемые CSS-правила (PurgeCSS);</li>
+            <li>Вынесите критические стили (inline в <code>&lt;head&gt;</code>).</li>
+          </ul>
+        </li>
+        <li><strong>Работа с данными</strong>
+          <ul>
+            <li>Реализуйте lazy-loading и пагинацию;</li>
+            <li>Предзагружайте только необходимое.</li>
+          </ul>
+        </li>
+      </ol>
+    </section>
+
+    <!-- 4.2 -->
+    <section id="4-2">
+      <h2>4.2. Инструменты анализа качества веб-приложений</h2>
+
+      <h3 id="4-2-1">4.2.1. Назначение инструментов аудита</h3>
+      <p>Современные веб-приложения должны быть быстрыми, доступными, безопасными и удобными. Для объективной оценки применяются автоматизированные инструменты, которые проверяют структуру сайта, качество кода и соответствие стандартам.</p>
+      <div class="note"><p><strong>Цель анализа:</strong> выявить узкие места в производительности, доступности и SEO ещё на этапе разработки.</p></div>
+
+      <h3 id="4-2-2">4.2.2. Lighthouse — комплексный инструмент аудита</h3>
+      <p>Lighthouse анализирует качество веб-страниц по пяти направлениям:</p>
+      <ol>
+        <li>Performance (Производительность)</li>
+        <li>Accessibility (Доступность)</li>
+        <li>Best Practices (Лучшие практики)</li>
+        <li>SEO (Поисковая оптимизация)</li>
+        <li>Progressive Web App (PWA)</li>
+      </ol>
+      <ul>
+        <li>Chrome DevTools (вкладка Lighthouse);</li>
+        <li>онлайн-версия в PageSpeed Insights;</li>
+        <li>Node.js CLI (npm install -g lighthouse).</li>
+      </ul>
+
+      <h3 id="4-2-3">4.2.3. Проведение анализа в Chrome DevTools</h3>
+      <ol>
+        <li>Открыть сайт в Chrome.</li>
+        <li>Нажать F12 → Lighthouse.</li>
+        <li>Выбрать категории для анализа.</li>
+        <li>Выбрать режим (Mobile или Desktop).</li>
+        <li>Нажать «Analyze page load».</li>
+        <li>Получить отчёт с оценками (0–100) и рекомендациями.</li>
+      </ol>
+      <div class="note"><p><strong>Совет:</strong> проводите анализ в режиме инкогнито и без расширений, чтобы исключить влияние плагинов.</p></div>
+
+      <h3 id="4-2-4">4.2.4. Раздел Performance (Производительность)</h3>
+      <table>
+        <thead><tr><th>Метрика</th><th>Смысл</th><th>Оптимальное значение</th></tr></thead>
+        <tbody>
+          <tr><td>First Contentful Paint (FCP)</td><td>Появление первого элемента</td><td>&le; 1.8 с</td></tr>
+          <tr><td>Largest Contentful Paint (LCP)</td><td>Появление основного контента</td><td>&le; 2.5 с</td></tr>
+          <tr><td>Total Blocking Time (TBT)</td><td>Суммарное время блокировки</td><td>&le; 200 мс</td></tr>
+          <tr><td>Cumulative Layout Shift (CLS)</td><td>Визуальная стабильность</td><td>&le; 0.1</td></tr>
+          <tr><td>Speed Index</td><td>Скорость визуального заполнения</td><td>&le; 3.4 с</td></tr>
+        </tbody>
+      </table>
+      <ul>
+        <li>Использовать сжатие (GZIP, Brotli);</li>
+        <li>уменьшить размер изображений;</li>
+        <li>применять <code>defer</code> и lazy-loading;</li>
+        <li>кэшировать статические ресурсы;</li>
+        <li>минимизировать CSS и JS.</li>
+      </ul>
+
+      <h3 id="4-2-5">4.2.5. Раздел Accessibility (Доступность)</h3>
+      <ul>
+        <li>Наличие <code>alt</code> у изображений;</li>
+        <li>правильная иерархия заголовков (<code>h1–h3</code>);</li>
+        <li>доступность элементов через клавиатуру (Tab);</li>
+        <li>контраст текста и фона;</li>
+        <li><code>aria-label</code>, роли (<code>role="navigation"</code>, <code>role="button"</code>).</li>
+      </ul>
+
+      <h3 id="4-2-6">4.2.6. Раздел Best Practices (Лучшие практики)</h3>
+      <ul>
+        <li>Использование HTTPS;</li>
+        <li>корректные размеры изображений;</li>
+        <li>отсутствие уязвимых библиотек;</li>
+        <li>безопасная работа с JavaScript API;</li>
+        <li>корректное внедрение внешнего контента (iframe, видео).</li>
+      </ul>
+      <div class="note"><p><strong>Рекомендации:</strong> обновляйте зависимости (<code>npm audit</code>), используйте CSP, добавьте <code>&lt;meta name="viewport"&gt;</code>.</p></div>
+
+      <h3 id="4-2-7">4.2.7. Раздел SEO (Поисковая оптимизация)</h3>
+      <ul>
+        <li>Наличие <code>&lt;title&gt;</code> и <code>&lt;meta name="description"&gt;</code>;</li>
+        <li>использование <code>&lt;h1&gt;</code> и структурированных данных;</li>
+        <li>правильная разметка ссылок;</li>
+        <li>адаптивность под мобильные устройства;</li>
+        <li>индексируемость (robots.txt, sitemap.xml).</li>
+      </ul>
+      <div class="note"><p><strong>Рекомендации:</strong> уникальные заголовки и описания, человеко-читаемые URL, Open Graph и Schema.org.</p></div>
+
+      <h3 id="4-2-8">4.2.8. Раздел Progressive Web App (PWA)</h3>
+      <ul>
+        <li>Service Worker;</li>
+        <li>манифест (<code>manifest.json</code>);</li>
+        <li>корректное отображение на мобильных устройствах;</li>
+        <li>работа без сети (offline cache);</li>
+        <li>HTTPS.</li>
+      </ul>
+      <pre><code class="language-json">{
+  "name": "Афиша театра",
+  "short_name": "Афиша",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0044cc",
+  "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
+}</code></pre>
+
+      <h3 id="4-2-9">4.2.9. Интерпретация результатов отчёта</h3>
+      <p>После анализа Lighthouse выдает оценки от 0 до 100 для каждой категории.</p>
+      <ul>
+        <li>90–100 — хорошо, оптимизировано;</li>
+        <li>50–89 — средний уровень, нужно улучшить;</li>
+        <li>0–49 — низкая оценка, критические проблемы.</li>
+      </ul>
+      <div class="note"><p><strong>Совет:</strong> фиксируйте результаты до и после оптимизации — это наглядно показывает прогресс.</p></div>
+    </section>
+
+    <!-- 4.3 -->
+    <section id="4-3">
+      <h2>4.3. Методы оптимизации веб-приложений</h2>
+
+      <h3 id="4-3-1">4.3.1. Цель оптимизации</h3>
+      <p>Оптимизация направлена на сокращение времени загрузки, уменьшение сетевой нагрузки и повышение отзывчивости интерфейса. Это улучшает UX и позиции сайта в поиске.</p>
+
+      <h3 id="4-3-2">4.3.2. Минификация и объединение файлов</h3>
+      <h4>А) Минификация (minification)</h4>
+      <pre><code class="language-js">// До
+function showMessage() {
+  console.log("Hello, world!");
+}
+// После
+function showMessage(){console.log("Hello,world!")}</code></pre>
+      <ul>
+        <li>JS: Terser, UglifyJS</li>
+        <li>CSS: CleanCSS, csso</li>
+        <li>HTML: HTMLMinifier</li>
+      </ul>
+
+      <h4>Б) Объединение (bundling)</h4>
+      <pre><code class="language-html">&lt;!-- До --&gt;
+&lt;link rel="stylesheet" href="reset.css"&gt;
+&lt;link rel="stylesheet" href="main.css"&gt;
+&lt;link rel="stylesheet" href="theme.css"&gt;
+&lt;!-- После --&gt;
+&lt;link rel="stylesheet" href="bundle.min.css"&gt;</code></pre>
+      <ul>
+        <li>Инструменты: Webpack, Parcel, Rollup, Gulp.</li>
+      </ul>
+
+      <h3 id="4-3-3">4.3.3. Использование кэширования и CDN</h3>
+      <h4>А) Кэширование</h4>
+      <pre><code class="language-text">Cache-Control: max-age=31536000, immutable
+ETag: "v1.2.3"</code></pre>
+      <h4>Б) CDN</h4>
+      <pre><code class="language-html">&lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;</code></pre>
+
+      <h3 id="4-3-4">4.3.4. Оптимизация изображений</h3>
+      <table>
+        <thead><tr><th>Метод</th><th>Пример</th><th>Эффект</th></tr></thead>
+        <tbody>
+          <tr><td>Сжатие</td><td>TinyPNG, Squoosh</td><td>Уменьшение размера</td></tr>
+          <tr><td>WebP / AVIF</td><td><code>&lt;img src="poster.webp"&gt;</code></td><td>-30–70% к размеру</td></tr>
+          <tr><td>Адаптивные изображения</td><td><code>srcset</code>, <code>sizes</code></td><td>Оптимум под устройство</td></tr>
+          <tr><td>Lazy Loading</td><td><code>loading="lazy"</code></td><td>Отложенная загрузка</td></tr>
+        </tbody>
+      </table>
+      <pre><code class="language-html">&lt;img src="poster.webp" alt="Афиша спектакля" width="600" height="400" loading="lazy"&gt;</code></pre>
+
+      <h3 id="4-3-5">4.3.5. Отложенная загрузка компонентов (Lazy Loading)</h3>
+      <pre><code class="language-js">document.getElementById("btnLoad").addEventListener("click", async () =&gt; {
+  const module = await import("./gallery.js");
+  module.initGallery();
+});</code></pre>
+
+      <h3 id="4-3-6">4.3.6. Сокращение количества HTTP-запросов</h3>
+      <table>
+        <thead><tr><th>Метод</th><th>Пример</th><th>Эффект</th></tr></thead>
+        <tbody>
+          <tr><td>Объединение файлов</td><td>Один bundle вместо нескольких</td><td>Меньше обращений</td></tr>
+          <tr><td>Sprite-графика</td><td>Иконки в одном изображении</td><td>Меньше загрузок</td></tr>
+          <tr><td>Встроенные SVG</td><td><code>&lt;svg&gt;</code> прямо в HTML</td><td>Мгновенное отображение</td></tr>
+          <tr><td>Base64 для мелких изображений</td><td><code>url(data:image/png;base64,...)</code></td><td>Исключение мелких запросов</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="4-3-7">4.3.7. Предзагрузка ресурсов</h3>
+      <pre><code class="language-html">&lt;link rel="preload" as="style" href="main.css"&gt;
+&lt;link rel="preload" as="script" href="app.js"&gt;
+&lt;script src="app.js" defer&gt;&lt;/script&gt;</code></pre>
+      <table>
+        <thead><tr><th>Атрибут</th><th>Действие</th><th>Когда использовать</th></tr></thead>
+        <tbody>
+          <tr><td><code>async</code></td><td>Выполняет скрипт сразу после загрузки</td><td>Независимые скрипты</td></tr>
+          <tr><td><code>defer</code></td><td>Выполняет скрипт после парсинга HTML</td><td>Связанные с DOM скрипты</td></tr>
+          <tr><td><code>preload</code></td><td>Раннее скачивание ресурса</td><td>Критичные файлы (шрифты, стили)</td></tr>
+          <tr><td><code>prefetch</code></td><td>Загрузка ресурсов на будущее</td><td>Следующие страницы</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="4-3-8">4.3.8. Комбинированный подход к оптимизации</h3>
+      <ol>
+        <li>Сжать и минифицировать файлы.</li>
+        <li>Объединить CSS/JS.</li>
+        <li>Настроить кэширование и CDN.</li>
+        <li>Использовать WebP и lazy loading.</li>
+        <li>Применить defer/preload.</li>
+        <li>Проверить результат в Lighthouse.</li>
+      </ol>
+      <p><strong>Результат:</strong> рост оценок Performance, улучшение UX/SEO, снижение нагрузки на сервер.</p>
+    </section>
+
+    <!-- 4.4 -->
+    <section id="4-4">
+      <h2>4.4. Критический путь рендеринга (Critical Rendering Path)</h2>
+
+      <h3 id="4-4-1">4.4.1. Понятие</h3>
+      <p><strong>Critical Rendering Path (CRP)</strong> — последовательность шагов, которые выполняет браузер от загрузки HTML до отображения первого пикселя.</p>
+      <div class="note"><p><strong>Цель оптимизации CRP:</strong> сократить время до появления основного контента (LCP) и готовности к взаимодействию (TTI).</p></div>
+
+      <h3 id="4-4-2">4.4.2. Этапы критического пути рендеринга</h3>
+      <table>
+        <thead><tr><th>Этап</th><th>Что делает браузер</th><th>Основные ресурсы</th></tr></thead>
+        <tbody>
+          <tr><td>1. Загрузка HTML</td><td>Получает и парсит документ</td><td>HTML</td></tr>
+          <tr><td>2. Построение DOM</td><td>Создаёт дерево элементов</td><td>HTML-теги</td></tr>
+          <tr><td>3. Построение CSSOM</td><td>Загружает и анализирует стили</td><td>CSS-файлы</td></tr>
+          <tr><td>4. DOM + CSSOM → Render Tree</td><td>Определяет видимые элементы и их оформление</td><td>DOM + CSSOM</td></tr>
+          <tr><td>5. Layout &amp; Paint</td><td>Вычисляет размеры/позиции и рисует пиксели</td><td>Render Tree</td></tr>
+        </tbody>
+      </table>
+      <div class="note"><p>Рендеринг начинается только после загрузки и анализа всех CSS-файлов.</p></div>
+
+      <h3 id="4-4-3">4.4.3. Визуальная схема Critical Rendering Path</h3>
+      <pre><code class="language-text">HTML → [Парсинг] → DOM
+       ↓
+    CSS → [Парсинг] → CSSOM
+       ↓
+   JS  → [Выполнение] → Модификация DOM/CSSOM
+       ↓
+ DOM + CSSOM → Render Tree
+       ↓
+Layout → Paint → Composite → Screen</code></pre>
+      <p><strong>Комментарий:</strong> JavaScript может приостанавливать процесс, если изменяет DOM или стили — используйте <code>defer</code>.</p>
+
+      <h3 id="4-4-4">4.4.4. Пример последовательности загрузки</h3>
+      <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="ru"&gt;
+  &lt;head&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+    &lt;script src="script.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Театр «АртДом»&lt;/h1&gt;
+    &lt;p&gt;Добро пожаловать на премьеру!&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      <ol>
+        <li>HTML загружается и парсится.</li>
+        <li>При встрече <code>&lt;link&gt;</code> рендер приостанавливается до загрузки CSS.</li>
+        <li><code>&lt;script&gt;</code> без <code>defer/async</code> блокирует парсинг DOM.</li>
+        <li>Только после загрузки зависимостей формируется Render Tree и начинается отрисовка.</li>
+      </ol>
+
+      <h3 id="4-4-5">4.4.5. Оптимизированная структура (уменьшение CRP)</h3>
+      <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="ru"&gt;
+  &lt;head&gt;
+    &lt;!-- Критические стили встроены --&gt;
+    &lt;style&gt;
+      body { font-family: Arial; background: #fff; color: #333; }
+      h1 { font-size: 2rem; }
+    &lt;/style&gt;
+
+    &lt;!-- Второстепенные стили загружаются асинхронно --&gt;
+    &lt;link rel="preload" href="style.css" as="style" onload="this.rel='stylesheet'"&gt;
+    &lt;noscript&gt;&lt;link rel="stylesheet" href="style.css"&gt;&lt;/noscript&gt;
+
+    &lt;!-- Скрипты выполняются после загрузки --&gt;
+    &lt;script src="script.js" defer&gt;&lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Афиша театра&lt;/h1&gt;
+    &lt;p&gt;Смотрите премьеру «Гамлет» уже сегодня!&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      <p><strong>Эффект:</strong> базовый контент появляется сразу, остальное подгружается позже — сокращается LCP и улучшается TTI.</p>
+
+      <h3 id="4-4-6">4.4.6. Влияние ресурсов на CRP</h3>
+      <table>
+        <thead><tr><th>Тип ресурса</th><th>Поведение по умолчанию</th><th>Влияние</th></tr></thead>
+        <tbody>
+          <tr><td>HTML</td><td>Основа, запускает всё</td><td>Определяет структуру</td></tr>
+          <tr><td>CSS</td><td>Блокирует рендеринг</td><td>Задерживает отображение</td></tr>
+          <tr><td>JS (без defer/async)</td><td>Блокирует парсинг DOM</td><td>Сильно замедляет загрузку</td></tr>
+          <tr><td>Шрифты</td><td>Могут блокировать текст</td><td>Эффекты FOIT/FOUT</td></tr>
+          <tr><td>Изображения</td><td>Не блокируют рендер</td><td>Влияют на LCP</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="4-4-7">4.4.7. Методы оптимизации CRP</h3>
+      <table>
+        <thead><tr><th>Метод</th><th>Пример</th><th>Эффект</th></tr></thead>
+        <tbody>
+          <tr><td>Inline Critical CSS</td><td>Встроить базовые стили в <code>&lt;head&gt;</code></td><td>Быстрая отрисовка</td></tr>
+          <tr><td>Defer/Async JS</td><td><code>&lt;script defer src="app.js"&gt;&lt;/script&gt;</code></td><td>Не блокирует DOM</td></tr>
+          <tr><td>Preload ключевых ресурсов</td><td><code>&lt;link rel="preload" as="style" href="main.css"&gt;</code></td><td>Раннее скачивание</td></tr>
+          <tr><td>Lazy-loading изображений</td><td><code>&lt;img loading="lazy"&gt;</code></td><td>Отложенная загрузка</td></tr>
+          <tr><td><code>font-display: swap</code></td><td><code>@font-face { font-display: swap; }</code></td><td>Текст виден сразу</td></tr>
+          <tr><td>Кэширование и CDN</td><td>HTTP Cache, Cloudflare</td><td>Снижение TTFB</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="4-4-8">4.4.8. Методы визуального ускорения</h3>
+      <ol>
+        <li>Skeleton loading — «скелет» страницы до загрузки контента.</li>
+        <li>Индикаторы прогресса — визуальная обратная связь.</li>
+        <li>Приоритизация видимого контента — сначала первый экран.</li>
+        <li>Preload ключевых изображений — <code>&lt;link rel="preload"&gt;</code>.</li>
+      </ol>
+
+      <h3 id="4-4-9">4.4.9. Проверка критического пути</h3>
+      <ul>
+        <li>Lighthouse → Performance → Filmstrip View.</li>
+        <li>Chrome DevTools → Performance → Record.</li>
+        <li>WebPageTest → Filmstrip.</li>
+      </ul>
+      <p><strong>Анализируйте:</strong> время до First Paint (FP), FCP и LCP.</p>
+    </section>
+
+  </div>
+</body>
+</html>

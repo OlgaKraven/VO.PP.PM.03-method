@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2. Основы клиентской веб‑разработки</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>2. Основы клиентской веб‑разработки</h1>
+      <p class="subtitle">Семантическая разметка, адаптивная вёрстка, JavaScript и модульность</p>
+      <nav>
+        <a href="#2-1">2.1 Понятие клиентской веб‑разработки</a>
+        <a href="#2-2">2.2 HTML5 и семантика</a>
+        <a href="#2-3">2.3 Семантические элементы</a>
+        <a href="#2-4">2.4 Иерархия элементов (DOM)</a>
+        <a href="#2-5">2.5 Основные элементы HTML</a>
+        <a href="#2-6">2.6 Семантика и доступность</a>
+        <a href="#2-7">2.7 CSS3 и адаптивность</a>
+        <a href="#2-8">2.8 JavaScript и DOM</a>
+        <a href="#2-9">2.9 Модульность и организация кода</a>
+      </nav>
+    </header>
+
+    <section id="2-1">
+      <h2>2.1. Понятие клиентской веб‑разработки</h2>
+      <p><strong>Клиентская веб‑разработка (frontend)</strong> — это область веб‑технологий, отвечающая за создание визуального и интерактивного интерфейса, с которым взаимодействует пользователь.
+      Она реализуется в браузере с помощью <strong>HTML</strong> (структура), <strong>CSS</strong> (стили) и <strong>JavaScript</strong> (поведение).
+      Основная задача фронтенда — преобразовать данные, полученные от сервера, в удобный и доступный для восприятия интерфейс.</p>
+    </section>
+
+    <section id="2-2">
+      <h2>2.2. HTML5 и семантическая структура документа</h2>
+      <h3>Определение</h3>
+      <p><strong>HTML (HyperText Markup Language)</strong> — язык гипертекстовой разметки, описывающий структуру и содержание веб‑страницы.
+      Версия <strong>HTML5</strong> ввела новые семантические элементы, повышающие читаемость кода и доступность для поисковых систем и технологий ассистивного доступа.</p>
+
+      <h3>Базовая структура HTML‑документа</h3>
+      <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="ru"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Театр — репертуар и билеты&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;header&gt;
+      &lt;h1&gt;Театр «АртДом»&lt;/h1&gt;
+      &lt;nav&gt;
+        &lt;ul&gt;
+          &lt;li&gt;&lt;a href="#repertoire"&gt;Репертуар&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#tickets"&gt;Билеты&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#contacts"&gt;Контакты&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/nav&gt;
+    &lt;/header&gt;
+
+    &lt;main id="repertoire"&gt;
+      &lt;section&gt;
+        &lt;h2&gt;Текущие спектакли&lt;/h2&gt;
+        &lt;article&gt;
+          &lt;h3&gt;Ромео и Джульетта&lt;/h3&gt;
+          &lt;p&gt;Постановка в классическом стиле. В главных ролях — ...&lt;/p&gt;
+          &lt;button&gt;Купить билет&lt;/button&gt;
+        &lt;/article&gt;
+      &lt;/section&gt;
+    &lt;/main&gt;
+
+    &lt;footer&gt;
+      &lt;p&gt;© 2025 Театр «АртДом»&lt;/p&gt;
+    &lt;/footer&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+      <div class="note">
+        <p><strong>Комментарий.</strong> Этот пример демонстрирует семантическую структуру:</p>
+        <ul class="kv">
+          <li><code>&lt;header&gt;</code> — верхняя часть страницы, логотип и навигация.</li>
+          <li><code>&lt;nav&gt;</code> — блок ссылок.</li>
+          <li><code>&lt;main&gt;</code> — основное содержимое страницы.</li>
+          <li><code>&lt;section&gt;</code> — логический раздел (например, афиша).</li>
+          <li><code>&lt;article&gt;</code> — самостоятельная публикация (описание спектакля).</li>
+          <li><code>&lt;footer&gt;</code> — нижний блок с контактами и копирайтом.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="2-3">
+      <h2>2.3. Семантические элементы HTML5</h2>
+      <div class="grid two">
+        <section>
+          <table>
+            <thead>
+              <tr><th>Элемент</th><th>Назначение</th><th>Пример использования</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>&lt;header&gt;</code></td><td>Вводная часть страницы или раздела</td><td>Шапка сайта, заголовок, логотип</td></tr>
+              <tr><td><code>&lt;nav&gt;</code></td><td>Основное меню навигации</td><td>Ссылки на разделы, страницы</td></tr>
+              <tr><td><code>&lt;main&gt;</code></td><td>Основное содержимое документа</td><td>Главный контент страницы</td></tr>
+              <tr><td><code>&lt;section&gt;</code></td><td>Тематический блок контента</td><td>Раздел «О театре», «Новости»</td></tr>
+              <tr><td><code>&lt;article&gt;</code></td><td>Независимый элемент публикации</td><td>Пост, карточка спектакля</td></tr>
+              <tr><td><code>&lt;aside&gt;</code></td><td>Дополнительная информация</td><td>Боковая панель, реклама</td></tr>
+              <tr><td><code>&lt;footer&gt;</code></td><td>Нижний колонтитул</td><td>Авторские права, контакты</td></tr>
+              <tr><td><code>&lt;figure&gt;/&lt;figcaption&gt;</code></td><td>Медиа и подпись</td><td>Фото афиши + подпись</td></tr>
+              <tr><td><code>&lt;video&gt;/&lt;audio&gt;</code></td><td>Мультимедиа контент</td><td>Видеотрейлер спектакля</td></tr>
+              <tr><td><code>&lt;form&gt;/&lt;input&gt;</code></td><td>Формы взаимодействия</td><td>Поиск, заказ, регистрация</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+    </section>
+
+    <section id="2-4">
+      <h2>2.4. Иерархия элементов</h2>
+      <p>HTML‑документ имеет дерево DOM (Document Object Model), где каждый элемент — это узел, вложенный в другие.</p>
+      <pre><code class="language-text">graph TD
+  A[html]
+  A --&gt; B[head]
+  A --&gt; C[body]
+  C --&gt; D[header]
+  C --&gt; E[main]
+  C --&gt; F[footer]
+  E --&gt; G[section]
+  G --&gt; H[article]
+  H --&gt; I[h3]
+  H --&gt; J[p]
+  H --&gt; K[button]</code></pre>
+      <div class="note"><p><strong>Интерпретация.</strong> DOM‑дерево позволяет JavaScript обращаться к любому элементу, изменять его содержимое, атрибуты и стиль.</p></div>
+    </section>
+
+    <section id="2-5">
+      <h2>2.5. Основные элементы HTML и их назначение</h2>
+      <h3>1) Заголовки и текстовые блоки</h3>
+      <pre><code class="language-html">&lt;h1&gt;Главный заголовок&lt;/h1&gt;
+&lt;h2&gt;Подзаголовок&lt;/h2&gt;
+&lt;p&gt;Абзац основного текста.&lt;/p&gt;</code></pre>
+      <ul class="kv">
+        <li><code>&lt;h1&gt;–&lt;h6&gt;</code> — иерархия заголовков (от главного к подзаголовкам).</li>
+        <li><code>&lt;p&gt;</code> — параграф текста.</li>
+      </ul>
+      <div class="note"><p><strong>Совет:</strong> Используйте только один <code>&lt;h1&gt;</code> на страницу — это улучшает SEO и доступность.</p></div>
+
+      <h3>2) Списки</h3>
+      <pre><code class="language-html">&lt;ul&gt;
+  &lt;li&gt;Пункт 1&lt;/li&gt;
+  &lt;li&gt;Пункт 2&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Первый&lt;/li&gt;
+  &lt;li&gt;Второй&lt;/li&gt;
+&lt;/ol&gt;</code></pre>
+      <ul class="kv">
+        <li><code>&lt;ul&gt;</code> — маркированный список.</li>
+        <li><code>&lt;ol&gt;</code> — нумерованный список.</li>
+        <li><code>&lt;li&gt;</code> — элемент списка.</li>
+      </ul>
+
+      <h3>3) Таблицы</h3>
+      <pre><code class="language-html">&lt;table&gt;
+  &lt;caption&gt;Расписание спектаклей&lt;/caption&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;&lt;th&gt;Дата&lt;/th&gt;&lt;th&gt;Спектакль&lt;/th&gt;&lt;th&gt;Время&lt;/th&gt;&lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;&lt;td&gt;04.11&lt;/td&gt;&lt;td&gt;Ромео и Джульетта&lt;/td&gt;&lt;td&gt;19:00&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;05.11&lt;/td&gt;&lt;td&gt;Щелкунчик&lt;/td&gt;&lt;td&gt;18:00&lt;/td&gt;&lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+      <div class="note"><p><strong>Правило:</strong> Используйте таблицы только для структурированных данных, а не для вёрстки.</p></div>
+
+      <h3>4) Формы</h3>
+      <pre><code class="language-html">&lt;form action="/submit" method="POST"&gt;
+  &lt;label for="name"&gt;Ваше имя:&lt;/label&gt;
+  &lt;input id="name" name="name" required&gt;
+  &lt;label for="email"&gt;Email:&lt;/label&gt;
+  &lt;input id="email" type="email" name="email" required&gt;
+  &lt;button type="submit"&gt;Отправить&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+      <ul class="kv">
+        <li>Атрибуты <code>action</code> и <code>method</code> определяют, куда и как отправляется форма.</li>
+        <li>Атрибут <code>required</code> делает поле обязательным.</li>
+        <li>Используйте <code>&lt;label&gt;</code> для доступности (экранные дикторы читают текст метки).</li>
+      </ul>
+
+      <h3>5) Мультимедиа‑вставки</h3>
+      <pre><code class="language-html">&lt;figure&gt;
+  &lt;img src="poster.jpg" alt="Афиша спектакля 'Ромео и Джульетта'"&gt;
+  &lt;figcaption&gt;Премьера — 4 ноября&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;video controls width="320"&gt;
+  &lt;source src="trailer.mp4" type="video/mp4"&gt;
+  Ваш браузер не поддерживает видео.
+&lt;/video&gt;
+
+&lt;audio controls&gt;
+  &lt;source src="soundtrack.mp3" type="audio/mpeg"&gt;
+&lt;/audio&gt;</code></pre>
+      <div class="note"><p><strong>Совет:</strong> Добавляйте атрибут <code>alt</code> к изображениям — это важно для SEO и доступности (WCAG).</p></div>
+    </section>
+
+    <section id="2-6">
+      <h2>2.6. Семантика и доступность (Accessibility)</h2>
+      <p>Семантическая разметка делает страницу понятной не только людям, но и машинам:</p>
+      <ul>
+        <li>поисковым роботам (SEO);</li>
+        <li>экранным дикторам (a11y);</li>
+        <li>парсерам и индексаторам контента.</li>
+      </ul>
+      <h3>Принципы доступной разметки</h3>
+      <ol>
+        <li>Каждому разделу — свой смысловой тег (<code>&lt;header&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;footer&gt;</code>).</li>
+        <li>Изображения — с <code>alt</code> и <code>&lt;figure&gt;</code>.</li>
+        <li>Формы — с <code>&lt;label&gt;</code> и <code>aria-*</code> атрибутами.</li>
+        <li>Навигация — через <code>&lt;nav&gt;</code> и логичные ссылки.</li>
+        <li>Таблицы — с <code>&lt;caption&gt;</code>, <code>&lt;thead&gt;</code>, <code>&lt;th&gt;</code> для заголовков колонок.</li>
+      </ol>
+    </section>
+
+    <section id="2-7">
+      <h2>2.7. CSS3 и адаптивная вёрстка</h2>
+
+      <h3 id="2-7-1">2.7.1. Понятие и назначение CSS3</h3>
+      <p><strong>CSS (Cascading Style Sheets)</strong> — каскадные таблицы стилей, язык описания внешнего вида HTML‑документа.
+      Версия CSS3 расширила возможности дизайна: появились Flexbox, Grid Layout, анимации, медиазапросы и переменные.</p>
+      <div class="note"><p><strong>Итог:</strong> цель CSS — отделить структуру (HTML) от представления (внешний вид). Это повышает гибкость, переиспользуемость и доступность веб‑интерфейса.</p></div>
+
+      <h3 id="2-7-2">2.7.2. Базовый синтаксис CSS</h3>
+      <pre><code class="language-css">селектор {
+  свойство: значение;
+}
+/* Пример */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #fafafa;
+  color: #222;
+}</code></pre>
+      <ul class="kv">
+        <li><em>селектор</em> — элемент HTML, к которому применяются стили;</li>
+        <li><em>свойство</em> — аспект внешнего вида (цвет, размер, отступ);</li>
+        <li><em>значение</em> — конкретное значение свойства.</li>
+      </ul>
+
+      <h3 id="2-7-3">2.7.3. Способы подключения CSS</h3>
+      <ol>
+        <li>Внешний файл — лучший способ (удобно поддерживать):<br><code>&lt;link rel="stylesheet" href="style.css"&gt;</code></li>
+        <li>Встроенные стили — внутри тега <code>&lt;style&gt;</code>:<br><code>&lt;style&gt;p { color: blue; }&lt;/style&gt;</code></li>
+        <li>Инлайн‑стили — прямо в элементе (не рекомендуется):<br><code>&lt;p style="color: blue;"&gt;Текст&lt;/p&gt;</code></li>
+      </ol>
+
+      <h3 id="2-7-4">2.7.4. Позиционирование элементов</h3>
+      <h4>A) Flexbox (Flexible Box Layout)</h4>
+      <pre><code class="language-html">&lt;div class="menu"&gt;
+  &lt;div&gt;Главная&lt;/div&gt;
+  &lt;div&gt;Репертуар&lt;/div&gt;
+  &lt;div&gt;Контакты&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+      <pre><code class="language-css">.menu {
+  display: flex;
+  justify-content: space-around; /* распределение по оси X */
+  align-items: center;           /* выравнивание по оси Y */
+  background: #f8f8f8;
+}</code></pre>
+      <div class="note">
+        <p><strong>Ключевые свойства Flexbox:</strong></p>
+        <ul class="kv">
+          <li><code>display: flex</code> — включает flex‑режим</li>
+          <li><code>flex-direction</code> — направление оси (<code>row</code>/<code>column</code>)</li>
+          <li><code>justify-content</code> — распределение по главной оси</li>
+          <li><code>align-items</code> — выравнивание по поперечной оси</li>
+          <li><code>flex-wrap</code> — перенос строк</li>
+          <li><code>gap</code> — расстояние между элементами</li>
+        </ul>
+      </div>
+
+      <h4>B) CSS Grid Layout</h4>
+      <pre><code class="language-html">&lt;div class="grid"&gt;
+  &lt;header&gt;Шапка&lt;/header&gt;
+  &lt;nav&gt;Меню&lt;/nav&gt;
+  &lt;main&gt;Контент&lt;/main&gt;
+  &lt;aside&gt;Боковая панель&lt;/aside&gt;
+  &lt;footer&gt;Футер&lt;/footer&gt;
+&lt;/div&gt;</code></pre>
+      <pre><code class="language-css">.grid {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "nav main"
+    "aside main"
+    "footer footer";
+  grid-template-columns: 1fr 3fr;
+  grid-template-rows: auto 1fr auto;
+  gap: 10px;
+}
+
+header { grid-area: header; background: #ececec; }
+nav    { grid-area: nav;    background: #fafafa; }
+main   { grid-area: main;   background: #fff; }
+aside  { grid-area: aside;  background: #f2f2f2; }
+footer { grid-area: footer; background: #ddd; }</code></pre>
+      <div class="note">
+        <p><strong>Grid подходит для:</strong></p>
+        <ul>
+          <li>лендингов, панелей, каталогов;</li>
+          <li>адаптивных макетов с фиксированными и гибкими областями.</li>
+        </ul>
+      </div>
+
+      <h3 id="2-7-5">2.7.5. Относительные единицы и адаптивность</h3>
+      <p>В адаптивной вёрстке используют относительные единицы измерения, чтобы интерфейс подстраивался под размер экрана:</p>
+      <table>
+        <thead><tr><th>Единица</th><th>Описание</th><th>Пример</th></tr></thead>
+        <tbody>
+          <tr><td>%</td><td>процент от родителя</td><td><code>width: 50%</code></td></tr>
+          <tr><td>em</td><td>относительно шрифта родителя</td><td><code>padding: 1.5em</code></td></tr>
+          <tr><td>rem</td><td>относительно корневого шрифта (html)</td><td><code>font-size: 1rem</code></td></tr>
+          <tr><td>vw, vh</td><td>процент ширины/высоты окна</td><td><code>width: 80vw</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="2-7-6">2.7.6. Медиа‑запросы (Media Queries)</h3>
+      <pre><code class="language-css">/* Для экранов шириной до 768px */
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+  .menu {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}</code></pre>
+      <div class="note">
+        <p><strong>Принцип mobile‑first:</strong> сначала создаётся версия для мобильных устройств, затем добавляются медиазапросы для планшетов и десктопов.</p>
+        <p><strong>Типовые точки перелома (breakpoints):</strong></p>
+        <table>
+          <thead><tr><th>Устройство</th><th>Ширина</th><th>Пример</th></tr></thead>
+          <tbody>
+            <tr><td>Смартфон</td><td>до 480 px</td><td><code>@media (max-width: 480px)</code></td></tr>
+            <tr><td>Планшет</td><td>481–768 px</td><td><code>@media (max-width: 768px)</code></td></tr>
+            <tr><td>Ноутбук</td><td>769–1200 px</td><td><code>@media (max-width: 1200px)</code></td></tr>
+            <tr><td>Десктоп</td><td>свыше 1200 px</td><td>по умолчанию</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 id="2-7-7">2.7.7. Пример адаптивной страницы театра</h3>
+      <pre><code class="language-html">&lt;header class="header"&gt;
+  &lt;h1&gt;Театр «АртДом»&lt;/h1&gt;
+  &lt;nav class="nav"&gt;
+    &lt;a href="#"&gt;Главная&lt;/a&gt;
+    &lt;a href="#"&gt;Репертуар&lt;/a&gt;
+    &lt;a href="#"&gt;Контакты&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;</code></pre>
+      <pre><code class="language-css">.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+}
+
+.nav a {
+  margin: 0 0.5rem;
+  text-decoration: none;
+}
+
+/* Адаптация под мобильные устройства */
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .nav a {
+    display: block;
+    margin: 0.25rem 0;
+  }
+}</code></pre>
+      <div class="note"><p><strong>Результат:</strong> На большом экране меню расположено в одну строку, на мобильном — превращается в вертикальный список.</p></div>
+
+      <h3 id="2-7-8">2.7.8. Дополнительные техники адаптивности</h3>
+      <table>
+        <thead><tr><th>Приём</th><th>Назначение</th><th>Пример</th></tr></thead>
+        <tbody>
+          <tr><td>Viewport meta‑тег</td><td>корректное масштабирование на мобильных</td><td><code>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code></td></tr>
+          <tr><td>Отзывчивые изображения</td><td>разные размеры для разных устройств</td><td><code>&lt;img srcset="small.jpg 480w, large.jpg 1200w" sizes="100vw"&gt;</code></td></tr>
+          <tr><td>CSS‑переменные</td><td>переиспользуемые значения</td><td><code>--main-color: #0044cc;</code></td></tr>
+          <tr><td>Flex/Grid‑комбинации</td><td>гибкое выравнивание внутри сетки</td><td><code>display: grid; place-items: center;</code></td></tr>
+          <tr><td>Responsive units</td><td>единицы vw/vh/rem</td><td><code>font-size: 2vw;</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="2-8">
+      <h2>2.8. JavaScript и работа с DOM</h2>
+
+      <h3 id="2-8-1">2.8.1. Назначение JavaScript</h3>
+      <p><strong>JavaScript (JS)</strong> — язык программирования, выполняемый в браузере, позволяющий делать веб‑страницы интерактивными: реагировать на действия пользователя, изменять содержимое без перезагрузки, обращаться к серверу, работать с анимациями, формами и API.
+      Современный стандарт — ECMAScript 2015 (ES6) и выше — добавил новые возможности: стрелочные функции, <code>let/const</code>, классы, модули, шаблонные строки и деструктуризацию.</p>
+
+      <h3 id="2-8-2">2.8.2. Базовый синтаксис ES6+</h3>
+      <pre><code class="language-js">// Объявление переменных
+let count = 0;       // можно изменять
+const pi = 3.14;     // константа, нельзя переопределить
+var oldStyle = true; // устаревший способ (лучше избегать)
+
+// Типы данных: number, string, boolean, object, array, function, null, undefined
+
+// Пример операций
+let name = "Анна";
+let tickets = 3;
+console.log(`${name} купила ${tickets} билета(ов)`); // шаблонная строка ES6</code></pre>
+
+      <h3 id="2-8-3">2.8.3. Условные операторы и циклы</h3>
+      <pre><code class="language-js">// Условие
+if (tickets &gt; 0) {
+  console.log("Есть билеты!");
+} else {
+  console.log("Распродано");
+}
+
+// Циклы
+for (let i = 1; i &lt;= 5; i++) {
+  console.log(`Билет №${i}`);
+}
+
+// Массив + forEach
+const shows = ["Гамлет", "Щелкунчик", "Ромео"];
+shows.forEach(title =&gt; console.log(`Спектакль: ${title}`));
+
+// Совет: используйте стрелочные функции (() =&gt; {}) — они компактны и не теряют контекст this.</code></pre>
+
+      <h3 id="2-8-4">2.8.4. Функции и стрелочный синтаксис</h3>
+      <pre><code class="language-js">// Обычная функция
+function greet(name) {
+  return `Добро пожаловать, ${name}!`;
+}
+
+// Стрелочная функция
+const greetUser = name =&gt; `Здравствуйте, ${name}!`;
+
+console.log(greetUser("Анна"));</code></pre>
+      <ul class="kv">
+        <li>стрелочные функции короче;</li>
+        <li>не создают собственный <code>this</code>, что удобно для обработчиков событий и колбэков.</li>
+      </ul>
+
+      <h3 id="2-8-5">2.8.5. Работа с DOM (Document Object Model)</h3>
+      <p>DOM — объектная модель HTML‑документа, представляющая его как дерево узлов.
+      JavaScript позволяет изменять DOM: добавлять, удалять и изменять элементы, атрибуты, стили и текст.</p>
+
+      <h4>Основные методы доступа к элементам</h4>
+      <table>
+        <thead><tr><th>Метод</th><th>Пример</th><th>Описание</th></tr></thead>
+        <tbody>
+          <tr><td><code>getElementById()</code></td><td><code>document.getElementById("title")</code></td><td>По идентификатору</td></tr>
+          <tr><td><code>getElementsByClassName()</code></td><td><code>document.getElementsByClassName("card")</code></td><td>По классу (HTMLCollection)</td></tr>
+          <tr><td><code>querySelector()</code></td><td><code>document.querySelector(".button")</code></td><td>По CSS‑селектору (первый элемент)</td></tr>
+          <tr><td><code>querySelectorAll()</code></td><td><code>document.querySelectorAll("p")</code></td><td>По CSS‑селектору (все элементы)</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Изменение содержимого и стилей</h4>
+      <pre><code class="language-html">&lt;h2 id="title"&gt;Репертуар&lt;/h2&gt;</code></pre>
+      <pre><code class="language-js">const title = document.getElementById("title");
+title.textContent = "Актуальные спектакли";  // изменение текста
+title.style.color = "darkred";               // изменение стиля</code></pre>
+
+      <h4>Добавление и удаление элементов</h4>
+      <pre><code class="language-js">const list = document.querySelector("#shows");
+const newItem = document.createElement("li");
+newItem.textContent = "Щелкунчик";
+list.appendChild(newItem);  // добавляем в список
+list.removeChild(list.firstElementChild); // удаляем первый элемент</code></pre>
+
+      <h3 id="2-8-6">2.8.6. Работа с событиями</h3>
+      <pre><code class="language-html">&lt;button id="buyBtn"&gt;Купить билет&lt;/button&gt;
+&lt;p id="status"&gt;&lt;/p&gt;</code></pre>
+      <pre><code class="language-js">const button = document.getElementById("buyBtn");
+const status = document.getElementById("status");
+
+button.addEventListener("click", () =&gt; {
+  status.textContent = "Билет добавлен в корзину!";
+  status.style.color = "green";
+});</code></pre>
+      <div class="note"><p><strong>Комментарий:</strong> <code>addEventListener()</code> — универсальный способ отслеживать действия пользователя (click, input, change, submit, mouseover, keydown и др.).</p></div>
+
+      <h3 id="2-8-7">2.8.7. Манипуляции с формами</h3>
+      <pre><code class="language-html">&lt;form id="orderForm"&gt;
+  &lt;input type="text" id="name" placeholder="Ваше имя" required&gt;
+  &lt;button type="submit"&gt;Оформить заказ&lt;/button&gt;
+&lt;/form&gt;
+&lt;p id="message"&gt;&lt;/p&gt;</code></pre>
+      <pre><code class="language-js">document.getElementById("orderForm").addEventListener("submit", event =&gt; {
+  event.preventDefault(); // предотвращаем перезагрузку
+  const userName = document.getElementById("name").value;
+  document.getElementById("message").textContent = `Спасибо, ${userName}! Заказ принят.`;
+});</code></pre>
+      <div class="note"><p><strong>Важно:</strong> <code>event.preventDefault()</code> отключает стандартное поведение формы (перезагрузку страницы).</p></div>
+
+      <h3 id="2-8-8">2.8.8. Пример: динамическая афиша театра</h3>
+      <pre><code class="language-html">&lt;ul id="repertoire"&gt;&lt;/ul&gt;
+&lt;button id="add"&gt;Добавить спектакль&lt;/button&gt;</code></pre>
+      <pre><code class="language-js">const shows = ["Гамлет", "Отелло", "Щелкунчик"];
+const list = document.getElementById("repertoire");
+const add = document.getElementById("add");
+
+// функция для отображения списка
+const render = () =&gt; {
+  list.innerHTML = "";
+  shows.forEach(title =&gt; {
+    const li = document.createElement("li");
+    li.textContent = title;
+    list.appendChild(li);
+  });
+};
+
+// обработчик добавления
+add.addEventListener("click", () =&gt; {
+  const newShow = prompt("Введите название спектакля:");
+  if (newShow) {
+    shows.push(newShow);
+    render();
+  }
+});
+
+render();</code></pre>
+      <div class="note"><p><strong>Результат:</strong> При нажатии кнопки появляется окно ввода, список спектаклей обновляется без перезагрузки страницы — демонстрация манипуляции DOM.</p></div>
+
+      <h3 id="2-8-9">2.8.9. Распространённые приёмы ES6+</h3>
+      <table>
+        <thead><tr><th>Приём</th><th>Пример</th><th>Назначение</th></tr></thead>
+        <tbody>
+          <tr><td>Деструктуризация</td><td><code>const {id, name} = user;</code></td><td>Быстро извлечь значения из объекта</td></tr>
+          <tr><td>Шаблонные строки</td><td><code>`Билет №${id}`</code></td><td>Интерполяция текста</td></tr>
+          <tr><td>Spread / Rest</td><td><code>const all = [...a, ...b];</code></td><td>Объединение массивов</td></tr>
+          <tr><td>Модули</td><td><code>import { func } from "./module.js";</code></td><td>Разделение кода на файлы</td></tr>
+          <tr><td>Стрелочные функции</td><td><code>arr.map(x =&gt; x*2)</code></td><td>Краткий синтаксис колбэков</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="2-8-10">2.8.10. Асинхронное программирование</h3>
+      <h4>2.8.10.1. Понятие асинхронности</h4>
+      <p>Асинхронное программирование — это подход, позволяющий выполнять длительные операции (запросы к серверу, загрузку файлов, чтение данных) без блокировки основного потока.
+      В JavaScript есть только один поток исполнения — но благодаря событийному циклу (event loop) и колбэкам, JS может обрабатывать несколько задач одновременно.</p>
+
+      <h4>2.8.10.2. Основные понятия</h4>
+      <table>
+        <thead><tr><th>Термин</th><th>Назначение</th></tr></thead>
+        <tbody>
+          <tr><td>Promise</td><td>Объект, представляющий результат асинхронной операции (fulfilled / rejected / pending)</td></tr>
+          <tr><td>fetch()</td><td>Встроенный метод для отправки HTTP‑запросов (GET, POST и т.д.)</td></tr>
+          <tr><td>async/await</td><td>Синтаксический сахар для удобной работы с Promise</td></tr>
+          <tr><td>JSON</td><td>Формат обмена данными между клиентом и сервером</td></tr>
+        </tbody>
+      </table>
+
+      <h4>2.8.10.3. Promise — базовая единица асинхронности</h4>
+      <pre><code class="language-js">const promise = new Promise((resolve, reject) =&gt; {
+  const success = true;
+  if (success) resolve("Данные успешно получены");
+  else reject("Ошибка загрузки");
+});
+
+promise
+  .then(result =&gt; console.log(result))
+  .catch(error =&gt; console.error(error))
+  .finally(() =&gt; console.log("Запрос завершён"));</code></pre>
+
+      <h4>2.8.10.4. Метод fetch()</h4>
+      <pre><code class="language-js">fetch("shows.json")
+  .then(response =&gt; response.json()) // преобразуем ответ в объект
+  .then(data =&gt; console.log(data))
+  .catch(error =&gt; console.error("Ошибка загрузки:", error));</code></pre>
+
+      <pre><code class="language-js">// Пример POST‑запроса
+fetch("https://api.example.com/tickets", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ event_id: 5, seat: "A12" })
+})
+  .then(res =&gt; res.json())
+  .then(data =&gt; console.log("Ответ сервера:", data))
+  .catch(err =&gt; console.error("Ошибка:", err));</code></pre>
+
+      <h4>2.8.10.5. async/await — современный синтаксис</h4>
+      <pre><code class="language-js">async function loadShows() {
+  try {
+    const response = await fetch("shows.json");   // ждём ответ
+    const shows = await response.json();          // ждём преобразования
+    console.log("Спектакли:", shows);
+  } catch (error) {
+    console.error("Ошибка загрузки:", error);
+  } finally {
+    console.log("Запрос завершён");
+  }
+}
+loadShows();</code></pre>
+
+      <h4>2.8.10.6. Пример: загрузка данных из JSON без перезагрузки страницы</h4>
+      <pre><code class="language-html">&lt;h2&gt;Афиша спектаклей&lt;/h2&gt;
+&lt;ul id="repertoire"&gt;&lt;/ul&gt;
+&lt;button id="loadBtn"&gt;Загрузить афишу&lt;/button&gt;</code></pre>
+      <pre><code class="language-js">document.getElementById("loadBtn").addEventListener("click", async () =&gt; {
+  const list = document.getElementById("repertoire");
+  list.innerHTML = "&lt;li&gt;Загрузка...&lt;/li&gt;";
+  try {
+    const res = await fetch("shows.json");
+    const shows = await res.json();
+    list.innerHTML = ""; // очищаем список
+    shows.forEach(show =&gt; {
+      const li = document.createElement("li");
+      li.textContent = `${show.title} — ${show.date}`;
+      list.appendChild(li);
+    });
+  } catch (error) {
+    list.innerHTML = `&lt;li style="color:red;"&gt;Ошибка загрузки данных&lt;/li&gt;`;
+  }
+});</code></pre>
+      <pre><code class="language-json">[
+  { "title": "Гамлет", "date": "2025-11-10" },
+  { "title": "Щелкунчик", "date": "2025-11-12" },
+  { "title": "Чайка", "date": "2025-11-15" }
+]</code></pre>
+
+      <h4>2.8.10.7. Обработка ошибок</h4>
+      <pre><code class="language-js">try {
+  const response = await fetch("missing.json");
+  if (!response.ok) throw new Error("Файл не найден");
+  const data = await response.json();
+} catch (error) {
+  console.error("Ошибка:", error.message);
+}</code></pre>
+
+      <h4>2.8.10.8. Параллельные запросы с Promise.all()</h4>
+      <pre><code class="language-js">async function loadData() {
+  const [shows, actors] = await Promise.all([
+    fetch("shows.json").then(r =&gt; r.json()),
+    fetch("actors.json").then(r =&gt; r.json())
+  ]);
+  console.log("Афиша:", shows);
+  console.log("Актёры:", actors);
+}</code></pre>
+
+      <h4>2.8.10.9. Пример интеграции с REST API</h4>
+      <pre><code class="language-js">async function getUsers() {
+  const response = await fetch("https://jsonplaceholder.typicode.com/users");
+  const users = await response.json();
+  const list = document.getElementById("users");
+  list.innerHTML = users.map(u =&gt; `&lt;li&gt;${u.name} (${u.email})&lt;/li&gt;`).join("");
+}
+getUsers();</code></pre>
+      <div class="note">
+        <p><strong>Реальные API для практики:</strong></p>
+        <ul>
+          <li>https://jsonplaceholder.typicode.com — фейковые данные пользователей/постов;</li>
+          <li>https://api.github.com/users — данные с GitHub;</li>
+          <li>https://swapi.dev/api/ — API «Звёздных войн».</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="2-9">
+      <h2>2.9. Модульность и организация кода</h2>
+
+      <h3 id="2-9-1">2.9.1. Понятие модульности</h3>
+      <p><strong>Модульность</strong> — принцип проектирования программ, при котором система делится на независимые части (модули), каждая из которых выполняет конкретную функцию и может разрабатываться, тестироваться и обновляться отдельно.</p>
+      <ul>
+        <li>повышает читаемость и повторное использование кода;</li>
+        <li>упрощает сопровождение;</li>
+        <li>изолирует ошибки;</li>
+        <li>обеспечивает масштабируемость проекта.</li>
+      </ul>
+
+      <h3 id="2-9-2">2.9.2. Основные принципы организации кода</h3>
+      <table>
+        <thead><tr><th>Принцип</th><th>Суть</th><th>Пример</th></tr></thead>
+        <tbody>
+          <tr><td>SRP (Single Responsibility)</td><td>Каждая функция или модуль выполняет одну задачу</td><td><code>renderTickets()</code> отвечает только за отрисовку</td></tr>
+          <tr><td>DRY (Don’t Repeat Yourself)</td><td>Не дублировать код, использовать функции и общие модули</td><td>вынести повторяющийся код в <code>utils.js</code></td></tr>
+          <tr><td>KISS (Keep It Simple, Stupid)</td><td>Избегать излишней сложности</td><td>простая логика вместо «умных» конструкций</td></tr>
+          <tr><td>Separation of Concerns</td><td>Разделение ответственности: данные, логика, интерфейс</td><td><code>data.js</code>, <code>controller.js</code>, <code>view.js</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="2-9-3">2.9.3. Организация проекта</h3>
+      <pre><code class="language-text">project/
+├── index.html            # Разметка
+├── css/
+│   └── style.css         # Стили
+├── js/
+│   ├── app.js            # Точка входа
+│   ├── data.js           # Работа с данными (fetch, JSON)
+│   ├── controller.js     # Бизнес-логика, обработчики событий
+│   ├── view.js           # Отрисовка элементов
+│   └── utils.js          # Вспомогательные функции
+└── shows.json            # Данные</code></pre>
+
+      <h3 id="2-9-4">2.9.4. Использование модулей (ES Modules)</h3>
+      <pre><code class="language-js">// Экспорт (в data.js)
+export const getShows = async () =&gt; {
+  const response = await fetch("shows.json");
+  return await response.json();
+};
+
+// Импорт (в app.js)
+import { getShows } from "./data.js";
+getShows().then(shows =&gt; console.log("Загружено:", shows));
+
+// Подключение модулей в HTML:
+/* &lt;script type="module" src="js/app.js"&gt;&lt;/script&gt; */</code></pre>
+
+      <h3 id="2-9-5">2.9.5. Функции‑контроллеры и разделение логики</h3>
+      <table>
+        <thead><tr><th>Слой</th><th>Назначение</th><th>Пример</th></tr></thead>
+        <tbody>
+          <tr><td>Модель (Model)</td><td>Работа с данными, API, JSON</td><td><code>data.js</code></td></tr>
+          <tr><td>Представление (View)</td><td>Отрисовка элементов на странице</td><td><code>view.js</code></td></tr>
+          <tr><td>Контроллер (Controller)</td><td>Управление логикой, связывает Model и View</td><td><code>controller.js</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="2-9-6">2.9.6. Пример MVC‑структуры (театральная афиша)</h3>
+      <pre><code class="language-js">// 1) data.js
+export async function getRepertoire() {
+  const res = await fetch("shows.json");
+  return await res.json();
+}
+
+// 2) view.js
+export function renderShows(shows) {
+  const list = document.getElementById("repertoire");
+  list.innerHTML = "";
+  shows.forEach(show =&gt; {
+    const li = document.createElement("li");
+    li.textContent = `${show.title} — ${show.date}`;
+    list.appendChild(li);
+  });
+}
+
+// 3) controller.js
+import { getRepertoire } from "./data.js";
+import { renderShows } from "./view.js";
+export async function init() {
+  const shows = await getRepertoire();
+  renderShows(shows);
+}
+
+// 4) app.js
+import { init } from "./controller.js";
+document.addEventListener("DOMContentLoaded", init);</code></pre>
+
+      <h3 id="2-9-7">2.9.7. Вспомогательные модули (utils)</h3>
+      <pre><code class="language-js">export const formatDate = (dateString) =&gt; {
+  const d = new Date(dateString);
+  return d.toLocaleDateString("ru-RU", { day: "2-digit", month: "long" });
+};
+export const showError = (msg) =&gt; { alert(`Ошибка: ${msg}`); };</code></pre>
+
+      <h3 id="2-9-8">2.9.8. Инкапсуляция и области видимости</h3>
+      <pre><code class="language-js">// internal.js
+const secretKey = "abc123"; // недоступно вне модуля
+export const publicFunction = () =&gt; "Открытая функция";</code></pre>
+
+      <h3 id="2-9-9">2.9.9. Пример динамического приложения (фрагмент)</h3>
+      <pre><code class="language-html">&lt;h2&gt;Репертуар&lt;/h2&gt;
+&lt;ul id="repertoire"&gt;&lt;/ul&gt;</code></pre>
+      <pre><code class="language-js">import { init } from "./controller.js";
+init();</code></pre>
+      <pre><code class="language-json">[
+  { "title": "Гамлет", "date": "2025-11-10" },
+  { "title": "Чайка", "date": "2025-11-15" }
+]</code></pre>
+      <div class="note"><p><strong>Комментарий:</strong> При загрузке страницы контроллер вызывает модель (fetch JSON) и представление (отрисовка списка). Код расширяем: добавьте модуль <code>filter.js</code> для сортировки по дате.</p></div>
+    </section>
+
+   
+  </div>
+</body>
+</html>
